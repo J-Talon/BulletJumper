@@ -5,6 +5,7 @@ namespace Input
     public interface InputListener
     {
 
+        //In order to prevent initialization errors subscribe should be called in Start(), not Awake()
         public void subscribe()
         {
             InputManager manager = InputManager.instance;

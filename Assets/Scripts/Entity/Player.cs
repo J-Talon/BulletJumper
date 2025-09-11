@@ -8,13 +8,13 @@ namespace Entity
     {
 
 
-        private float moveSpeed = 1;
-        private Rigidbody2D rb;
+        private float moveSpeed = 5;
+        //private Rigidbody2D rb;
         
-        public void Awake()
+        public void Start()
         {
             ((InputListener)this).subscribe();
-            rb = GetComponent<Rigidbody2D>();
+            //rb = GetComponent<Rigidbody2D>();
         }
 
         
@@ -34,27 +34,28 @@ namespace Entity
 
         public override void die()
         {
+          //do something related to a game over state here
         }
 
 
         public void keyMovementVectorUpdate(Vector2 vector)
         {
-            rb.linearVelocity = vector;
+            // rb.linearVelocity = vector * moveSpeed;
         }
 
         public void mousePositionUpdate(Vector2 mousePosition)
         {
-            Debug.Log("mouse vector update");
+          //  Debug.Log(mousePosition);
         }
 
         public void leftMousePress(float mouseValue)
         {
-            Debug.Log("left mouse press");
+          //  Debug.Log("left mouse press");
         }
 
         public void leftMouseRelease(float mouseValue)
         {
-            Debug.Log("left mouse release");
+          //  Debug.Log("left mouse release");
         }
 
     }

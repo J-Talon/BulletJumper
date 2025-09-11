@@ -1,5 +1,6 @@
 using System;
 using Event;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Controls;
@@ -10,7 +11,7 @@ namespace Input
     {
 
         public static InputManager instance;
-        
+
         [SerializeField]
         public InputActionAsset controls;
         
@@ -63,30 +64,28 @@ namespace Input
         void Update()
         {
             Vector2 keyboardVector = keyboardMoveAction.ReadValue<Vector2>();
-
+            
             if (lastKeyboardVector != keyboardVector)
             {
                 keyboardMoveDispatcher.dispatchEvent(keyboardVector);
                 lastKeyboardVector = keyboardVector;
             }
 
-
-            // Vector2 mouseVector = mouseMoveAction.ReadValue<Vector2>();
-            // if (mouseVector.x != lastMousePosition.x && mouseVector.y != lastMousePosition.y)
-            // {
-            //     mouseMoveDispatcher.dispatchEvent(mouseVector);
-            //     lastMousePosition = mouseVector;
-            // }
-            //
-            // float mouseState = mouseButtonAction.ReadValue<float>();
-            // if (mouseState >= 1 && lastLeftMouseState >= 1)
-            //     mouseDownDispatcher.dispatchEvent(mouseState);
-            // else if (mouseState < 1 && lastLeftMouseState < 1)
-            //     mouseUpDispatcher.dispatchEvent(mouseState);
-            // lastLeftMouseState = mouseState;
-
-
-
+            Vector2 mouseVector = mouseMoveAction.ReadValue<Vector2>();
+            if (mouseVector.x != lastMousePosition.x && mouseVector.y != lastMousePosition.y)
+            {
+                mouseMoveDispatcher.dispatchEvent(mouseVector);
+                lastMousePosition = mouseVector;
+            }
+            
+            
+            float mouseState = mouseButtonAction.ReadValue<float>();
+            if (mouseState >= 1 && lastLeftMouseState < 1)
+                mouseDownDispatcher.dispatchEvent(mouseState);
+            else if (mouseState < 1 && lastLeftMouseState >= 1)
+                mouseUpDispatcher.dispatchEvent(mouseState);
+            lastLeftMouseState = mouseState;
+            
         }
     }
     

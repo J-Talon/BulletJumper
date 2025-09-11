@@ -9,7 +9,5 @@ public class Startup
     {
         SceneManager.LoadScene("Scenes/ConstantLoad");
         SceneManager.LoadScene("Scenes/MainScene");
-
-
     }
 }
