@@ -49,13 +49,13 @@ namespace Input
 
 
         //this is required to have the input work
-        private void onEnable()
+        private void OnEnable()
         {
             controls.Enable();
         }
 
         //this is required to have the input work
-        private void onDisable()
+        private void OnDisable()
         {
             controls.Disable();
         }
