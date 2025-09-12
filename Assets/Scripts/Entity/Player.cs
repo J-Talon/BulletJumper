@@ -62,14 +62,8 @@ namespace Entity
 
             bool castLeft = Physics2D.Raycast(separationLeft, Vector2.down, castDistance, layerMask);
             bool castRight = Physics2D.Raycast(separationRight, Vector2.down, castDistance, layerMask);
-            
-            
-            if (castLeft || castRight)
-            {
-                onGround = true;
-            }
-            else onGround = false;
-            
+
+            onGround = (castLeft || castRight);
             Vector2 velocity = rigidBody.linearVelocity;
 
             if (onGround)
@@ -80,6 +74,7 @@ namespace Entity
                     groundMovement.y = moveAxis.y * MOVE_SPEED;
                 else if (moveAxis.x != 0 && moveAxis.y != 0)
                 {
+                    //this fixes an issue where moving and jumping makes the player jump lower
                     groundMovement.y = moveAxis.y * MOVE_SPEED * 1.5f;
                 }
                 
@@ -89,11 +84,7 @@ namespace Entity
             {
                 rigidBody.linearVelocity = new Vector2(moveAxis.x * MOVE_SPEED, velocity.y);
             }
-
-
-
-
-
+            
         }
 
 

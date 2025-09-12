@@ -1,9 +1,7 @@
-using System;
+
 using Event;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.InputSystem.Controls;
 
 namespace Input
 {
