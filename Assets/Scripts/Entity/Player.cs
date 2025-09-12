@@ -29,8 +29,6 @@ namespace Entity
             ((InputListener)this).subscribe();
             rigidBody = GetComponent<Rigidbody2D>();
             moveAxis = Vector2.zero;
-            castSeparation = 0;
-            castDistance = 0;
             onGround = true;
         }
 
@@ -56,19 +54,20 @@ namespace Entity
 
         public void FixedUpdate()
         {
-            
-            Vector2 separationLeft = new Vector2(castSeparation - transform.position.x, transform.position.y + verticalCastOffset);
-            Vector2 separationRight = new Vector2(castSeparation + transform.position.x, transform.position.y + verticalCastOffset);
+
+            float transformX = transform.position.x;
+            float transformY = transform.position.y;
+            Vector2 separationLeft = new Vector2(transformX - castSeparation, transformY + verticalCastOffset);
+            Vector2 separationRight = new Vector2(transformX + castSeparation, transformY + verticalCastOffset);
 
             bool castLeft = Physics2D.Raycast(separationLeft, Vector2.down, castDistance, layerMask);
             bool castRight = Physics2D.Raycast(separationRight, Vector2.down, castDistance, layerMask);
             
             
-            if (castLeft || castRight)
-            {
+            if (castRight || castLeft)
                 onGround = true;
-            }
-            else onGround = false;
+            else
+                onGround = false;
             
             Vector2 velocity = rigidBody.linearVelocity;
 
@@ -122,9 +121,11 @@ namespace Entity
         //the lines disappear when the game is running
         private void OnDrawGizmos()
         {
-            Vector2 separationLeft = new Vector2(transform.position.x - castSeparation,transform.position.y + verticalCastOffset);
-            Vector2 separationRight = new Vector2(transform.position.x + castSeparation, transform.position.y + verticalCastOffset);
-            
+            float transformX = transform.position.x;
+            float transformY = transform.position.y;
+            Vector2 separationLeft = new Vector2(transformX - castSeparation, transformY + verticalCastOffset);
+            Vector2 separationRight = new Vector2(transformX + castSeparation, transformY + verticalCastOffset);
+
             Vector2 endLeft = separationLeft + (Vector2.down * castDistance);
             Vector2 endRight = separationRight + (Vector2.down * castDistance);
             
