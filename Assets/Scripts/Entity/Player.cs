@@ -117,6 +117,9 @@ namespace Entity
           //  Debug.Log("left mouse release");
         }
 
+        
+        //this method draws white lines under the player for debugging in the unity editor
+        //the lines disappear when the game is running
         private void OnDrawGizmos()
         {
             Vector2 separationLeft = new Vector2(transform.position.x - castSeparation,transform.position.y + verticalCastOffset);
