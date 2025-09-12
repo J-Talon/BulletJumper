@@ -18,9 +18,9 @@ namespace Entity
         [SerializeField]
         public LayerMask layerMask;
 
-        [SerializeField]
-        public Vector2 groundCast;
-
+        [SerializeField] public float castSeparation;
+        [SerializeField] public float verticalCastOffset;
+        
         [SerializeField]
         public float castDistance;
         
@@ -29,7 +29,7 @@ namespace Entity
             ((InputListener)this).subscribe();
             rigidBody = GetComponent<Rigidbody2D>();
             moveAxis = Vector2.zero;
-            groundCast = Vector2.zero;
+            castSeparation = 0;
             castDistance = 0;
             onGround = true;
         }
@@ -57,25 +57,43 @@ namespace Entity
         public void FixedUpdate()
         {
             
+            Vector2 separationLeft = new Vector2(castSeparation - transform.position.x, transform.position.y + verticalCastOffset);
+            Vector2 separationRight = new Vector2(castSeparation + transform.position.x, transform.position.y + verticalCastOffset);
+
+            bool castLeft = Physics2D.Raycast(separationLeft, Vector2.down, castDistance, layerMask);
+            bool castRight = Physics2D.Raycast(separationRight, Vector2.down, castDistance, layerMask);
             
-            RaycastHit2D hit =
-                Physics2D.BoxCast(transform.position, groundCast, 0, -transform.up, castDistance);
-            if (hit)
+            
+            if (castLeft || castRight)
             {
                 onGround = true;
             }
             else onGround = false;
-            //
-            //
-            //
-            Debug.Log(onGround);
-            
             
             Vector2 velocity = rigidBody.linearVelocity;
-            rigidBody.linearVelocity = new Vector2(moveAxis.x * MOVE_SPEED, velocity.y);
 
-            if (moveAxis.y != 0 && onGround)
-                rigidBody.AddForce(new Vector2(0,moveAxis.y * MOVE_SPEED), ForceMode2D.Impulse);
+            if (onGround)
+            {
+                Vector2 groundMovement = new Vector2(moveAxis.x * MOVE_SPEED, velocity.y);
+                
+                if (moveAxis.x == 0 && moveAxis.y != 0)
+                    groundMovement.y = moveAxis.y * MOVE_SPEED;
+                else if (moveAxis.x != 0 && moveAxis.y != 0)
+                {
+                    groundMovement.y = moveAxis.y * MOVE_SPEED * 1.5f;
+                }
+                
+                rigidBody.linearVelocity = groundMovement;
+            }
+            else
+            {
+                rigidBody.linearVelocity = new Vector2(moveAxis.x * MOVE_SPEED, velocity.y);
+            }
+
+
+
+
+
         }
 
 
@@ -101,7 +119,14 @@ namespace Entity
 
         private void OnDrawGizmos()
         {
-            Gizmos.DrawLine(transform.position, new Vector2(transform.position.x, transform.position.y) + (Vector2.down * castDistance));
+            Vector2 separationLeft = new Vector2(transform.position.x - castSeparation,transform.position.y + verticalCastOffset);
+            Vector2 separationRight = new Vector2(transform.position.x + castSeparation, transform.position.y + verticalCastOffset);
+            
+            Vector2 endLeft = separationLeft + (Vector2.down * castDistance);
+            Vector2 endRight = separationRight + (Vector2.down * castDistance);
+            
+            Gizmos.DrawLine(separationLeft, endLeft);
+            Gizmos.DrawLine(separationRight, endRight);
         }
 
     }
