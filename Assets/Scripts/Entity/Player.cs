@@ -1,4 +1,5 @@
-﻿using Input;
+﻿using System;
+using Input;
 using Item;
 using UnityEngine;
 
@@ -10,26 +11,33 @@ namespace Entity
 
         private const float MOVE_SPEED = 5;
         private bool onGround;
+        private int facingDirection;
         private Gun gun;
 
         private Vector2 moveAxis;
         private Rigidbody2D rigidBody;
+        private Animator animator;
         
-        [SerializeField]
-        public LayerMask layerMask;
-
+        //layer mask for ground checks
+        [SerializeField] public LayerMask layerMask;
+        
+        //x separation of ground check raycasts
         [SerializeField] public float castSeparation;
+        
+        //y offset of ground check raycasts
         [SerializeField] public float verticalCastOffset;
         
-        [SerializeField]
-        public float castDistance;
+        //distance to perform the raycast
+        [SerializeField] public float castDistance;
         
         public void Start()
         {
             ((InputListener)this).subscribe();
             rigidBody = GetComponent<Rigidbody2D>();
+            animator = GetComponent<Animator>();
             moveAxis = Vector2.zero;
             onGround = true;
+            facingDirection = 1;
         }
 
         
@@ -63,18 +71,32 @@ namespace Entity
             bool castLeft = Physics2D.Raycast(separationLeft, Vector2.down, castDistance, layerMask);
             bool castRight = Physics2D.Raycast(separationRight, Vector2.down, castDistance, layerMask);
             
+            onGround = (castLeft || castRight);
+            animator.SetBool("onGround",onGround);
             
-            if (castRight || castLeft)
-                onGround = true;
+            if (moveAxis.x == 0)
+                animator.SetBool("isMoving", false);
             else
-                onGround = false;
-            
+            {
+                int moveDirection = moveAxis.x > 0 ? 1 : -1;
+                if (moveDirection != facingDirection)
+                {
+                    Vector3 scale = transform.localScale;
+                    scale.x *= -1;
+                    transform.localScale = scale;
+                    facingDirection = moveDirection;
+                }
+
+                animator.SetBool("isMoving", true);
+            }
+
+
             Vector2 velocity = rigidBody.linearVelocity;
 
             if (onGround)
             {
                 Vector2 groundMovement = new Vector2(moveAxis.x * MOVE_SPEED, velocity.y);
-                
+
                 if (moveAxis.x == 0 && moveAxis.y != 0)
                     groundMovement.y = moveAxis.y * MOVE_SPEED;
                 else if (moveAxis.x != 0 && moveAxis.y != 0)
@@ -88,11 +110,6 @@ namespace Entity
             {
                 rigidBody.linearVelocity = new Vector2(moveAxis.x * MOVE_SPEED, velocity.y);
             }
-
-
-
-
-
         }
 
 
