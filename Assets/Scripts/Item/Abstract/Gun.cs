@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Entity;
+using UnityEngine;
 
 namespace Item
 {
@@ -10,9 +11,10 @@ namespace Item
         protected Animator animator;
         protected int cooldown;
         protected int lastFireTime;
+        protected LayerMask groundMask;
         
         //protected float recoilOffset;  //recoil effect
-        public Gun(GameObject renderer)
+        public Gun(GameObject renderer, LayerMask ground)
         {
             this.renderer = renderer;
             axisZRotation = 0;
@@ -22,7 +24,7 @@ namespace Item
         }
         
         //return whether the gun fired successfully
-        public abstract bool fire(float fixedTime, int playerBullets, string ownerId, int facingDirection);
+        public abstract bool fire(float fixedTime, Player player, int facingDirection, float holdMillis);
         
         //return whether the gun can fire
         protected abstract bool canFire(float fixedTime, int playerBullets);

@@ -7,7 +7,7 @@ namespace Item
     public class Rifle: Gun
     {
         
-        public Rifle(GameObject reference): base(reference)
+        public Rifle(GameObject reference, LayerMask ground): base(reference, ground)
         {
             cooldown = 1000;
             //set the base sprites and animations here based on the gun
@@ -25,12 +25,18 @@ namespace Item
         }
 
 
-        public override bool fire(float fixedTime, int playerBullets, string ownerId, int facingDirection)
+        public override bool fire(float fixedTime, Player player, int facingDirection, float holdMillis)
         {
-            if (!canFire(fixedTime, playerBullets))
-                return false;
-
-            const float SPEED = 4;
+            
+            float[] millisHoldStages =  new float[]{1000,2000};
+            int power = 0;
+            int bullets = player.getPlayerBullets();
+            while (power < millisHoldStages.Length && holdMillis > millisHoldStages[power])
+                power++;
+            
+            
+            
+            const float SPEED = 8;
             GameObject reference = base.renderer;
             Transform form = reference.transform;
             
@@ -56,10 +62,37 @@ namespace Item
             Vector2 scale = direction * hypotenuse;
             Vector2 spawnPosition = new Vector2(form.position.x + scale.x, form.position.y + scale.y);
 
-            EntityFactory.createProjectile(spawnPosition, ownerId, direction, SPEED);
-           // animator.SetBool("onFire",true);
+            if (power < 1)
+            {
+                if (!canFire(fixedTime, bullets))
+                    return false;
+                
+                lastFireTime = (int)fixedTime * 1000;
+                EntityFactory.createProjectile(spawnPosition, player.getID(), direction, SPEED);
+
+                Vector2 recoil = direction * -10;
+                player.push(recoil);
+                animator.SetTrigger("onFire");
             
-            return true;
+                return true;
+            }
+            else
+            {
+                if (!canFire(fixedTime, bullets))
+                    return false;
+
+                if (!(bullets >= power))
+                    return false;
+                
+                lastFireTime = (int)fixedTime * 1000;
+                
+                EntityFactory.createProjectile(spawnPosition, player.getID(), direction, SPEED);
+
+                Vector2 recoil = direction * (-10 * (power));
+                player.push(recoil);
+                animator.SetTrigger("onFire");
+                return true;
+            }
         }
 
         

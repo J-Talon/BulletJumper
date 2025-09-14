@@ -10,6 +10,8 @@ namespace Entity
 
 
         private const float MOVE_SPEED = 5;
+        private const float HOR_MAX_SPEED = 6;
+        
         private bool onGround;
         private int facingDirection;
 
@@ -20,9 +22,14 @@ namespace Entity
         private Vector2 moveAxis;
         private Rigidbody2D rigidBody;
         private Animator animator;
+        private Vector2 impulsePush;
 
         private Vector3 mouseWorldPosition;
-        
+        private float mouseDownTime;
+
+
+        [SerializeField]
+        private float impulseDamping;
         
         //how far away to hold the item
         [SerializeField] public float itemOffsetDistance;
@@ -54,7 +61,9 @@ namespace Entity
             bulletCount = startingBullets;
 
             itemRenderer = transform.GetChild(0).gameObject;
-            holdingItem = new Rifle(itemRenderer);
+            holdingItem = new Rifle(itemRenderer, layerMask);
+            mouseDownTime = 0;
+            impulsePush = Vector2.zero;
 
             if (itemOffsetDistance <= 0)
                 itemOffsetDistance = 1;
@@ -106,7 +115,7 @@ namespace Entity
 
             if (onGround)
             {
-                Vector2 groundMovement = new Vector2(moveAxis.x * MOVE_SPEED, velocity.y);
+                Vector2 groundMovement = new Vector2(moveAxis.x * MOVE_SPEED + impulsePush.x, velocity.y + impulsePush.y);
 
                 if (moveAxis.x == 0 && moveAxis.y != 0)
                     groundMovement.y = moveAxis.y * MOVE_SPEED;
@@ -119,10 +128,16 @@ namespace Entity
             }
             else
             {
-                rigidBody.linearVelocity = new Vector2(moveAxis.x * MOVE_SPEED, velocity.y);
+
+                float inAirMovementX = moveAxis.x * MOVE_SPEED + velocity.x + impulsePush.x;
+                inAirMovementX = Math.Min(HOR_MAX_SPEED, inAirMovementX);
+                inAirMovementX = Math.Max(-HOR_MAX_SPEED, inAirMovementX);
+                
+                rigidBody.linearVelocity = new Vector2(inAirMovementX, velocity.y + impulsePush.y);
             }
             
-            
+            impulsePush = Vector2.zero;
+
             float diff = mouseWorldPosition.x - transform.position.x;
             
             if (diff < 0 && facingDirection > 0)
@@ -184,17 +199,20 @@ namespace Entity
         
         public void leftMousePress(float mouseValue)
         {
-            if (holdingItem != null)
-                holdingItem.fire(Time.fixedTime,bulletCount,guid,facingDirection);
-            else
-            {
-                Debug.Log("holdingItem is null");
-            }
+            mouseDownTime = Time.fixedTime * 1000f;
         }
 
         public void leftMouseRelease(float mouseValue)
         {
-          //  Debug.Log("left mouse release");
+            float holdTime = (Time.fixedTime * 1000f) - mouseDownTime;
+            if (holdingItem != null)
+                holdingItem.fire(Time.fixedTime,this,facingDirection ,holdTime);
+            else
+            {
+                Debug.Log("holdingItem is null");
+            }
+            
+            //  Debug.Log("left mouse release");
         }
 
         
@@ -212,6 +230,21 @@ namespace Entity
             
             Gizmos.DrawLine(separationLeft, endLeft);
             Gizmos.DrawLine(separationRight, endRight);
+        }
+            
+        ///////////////////////////////////
+        //getters / setters
+
+        
+        
+        public int getPlayerBullets()
+        {
+            return bulletCount;
+        }
+
+        public void push(Vector2 vector)
+        {
+            impulsePush += vector;
         }
 
     }

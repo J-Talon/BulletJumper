@@ -24,6 +24,7 @@ namespace Entity.Projectiles
             this.ownerID = ownerId;
             this.direction = direction;
             this.moveSpeed = moveSpeed;
+            base.initID();
         }
 
         public void Awake()
@@ -36,6 +37,15 @@ namespace Entity.Projectiles
             Vector2 vector = direction * moveSpeed;
             rigidBody.linearVelocity = vector;
         }
-        
+
+        public void onCollideEntity(GameObject entity)
+        {
+            
+        }
+
+        public void onCollideTerrain(GameObject terrain)
+        {
+            
+        }
     }
 }
