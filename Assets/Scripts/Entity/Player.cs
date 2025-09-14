@@ -101,6 +101,7 @@ namespace Entity
 
             bool castLeft = Physics2D.Raycast(separationLeft, Vector2.down, castDistance, layerMask);
             bool castRight = Physics2D.Raycast(separationRight, Vector2.down, castDistance, layerMask);
+
             
             onGround = (castLeft || castRight);
             animator.SetBool("onGround",onGround);
@@ -121,6 +122,7 @@ namespace Entity
                     groundMovement.y = moveAxis.y * MOVE_SPEED;
                 else if (moveAxis.x != 0 && moveAxis.y != 0)
                 {
+                    //this fixes an issue where moving and jumping makes the player jump lower
                     groundMovement.y = moveAxis.y * MOVE_SPEED * 1.5f;
                 }
                 
@@ -176,6 +178,7 @@ namespace Entity
                 diff.x *= -1;
             
             holdingItem.transformUpdate(diff);
+
         }
 
 
