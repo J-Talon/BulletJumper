@@ -5,18 +5,29 @@ using UnityEngine;
 
 namespace Entity
 {
-    public class Player: GameEntity, InputListener
+    public class Player: LivingEntity, InputListener
     {
 
 
         private const float MOVE_SPEED = 5;
         private bool onGround;
         private int facingDirection;
-        private Gun gun;
+
+        private GameObject itemRenderer;
+        private Gun holdingItem;
+        private int bulletCount;
 
         private Vector2 moveAxis;
         private Rigidbody2D rigidBody;
         private Animator animator;
+
+        private Vector3 mouseWorldPosition;
+        
+        
+        //how far away to hold the item
+        [SerializeField] public float itemOffsetDistance;
+        
+        [SerializeField] public int startingBullets;
         
         //layer mask for ground checks
         [SerializeField] public LayerMask layerMask;
@@ -32,12 +43,22 @@ namespace Entity
         
         public void Start()
         {
+            base.initID();
             ((InputListener)this).subscribe();
             rigidBody = GetComponent<Rigidbody2D>();
             animator = GetComponent<Animator>();
             moveAxis = Vector2.zero;
             onGround = true;
             facingDirection = 1;
+            mouseWorldPosition = Vector3.zero;
+            bulletCount = startingBullets;
+
+            itemRenderer = transform.GetChild(0).gameObject;
+            holdingItem = new Rifle(itemRenderer);
+
+            if (itemOffsetDistance <= 0)
+                itemOffsetDistance = 1;
+            
         }
 
         
@@ -60,9 +81,10 @@ namespace Entity
           //do something related to a game over state here
         }
 
-        public void FixedUpdate()
-        {
+        
 
+        private void movementUpdate()
+        {
             float transformX = transform.position.x;
             float transformY = transform.position.y;
             Vector2 separationLeft = new Vector2(transformX - castSeparation, transformY + verticalCastOffset);
@@ -77,18 +99,7 @@ namespace Entity
             if (moveAxis.x == 0)
                 animator.SetBool("isMoving", false);
             else
-            {
-                int moveDirection = moveAxis.x > 0 ? 1 : -1;
-                if (moveDirection != facingDirection)
-                {
-                    Vector3 scale = transform.localScale;
-                    scale.x *= -1;
-                    transform.localScale = scale;
-                    facingDirection = moveDirection;
-                }
-
                 animator.SetBool("isMoving", true);
-            }
 
 
             Vector2 velocity = rigidBody.linearVelocity;
@@ -110,6 +121,46 @@ namespace Entity
             {
                 rigidBody.linearVelocity = new Vector2(moveAxis.x * MOVE_SPEED, velocity.y);
             }
+            
+            
+            float diff = mouseWorldPosition.x - transform.position.x;
+            
+            if (diff < 0 && facingDirection > 0)
+            {
+                facingDirection = -1;
+                Vector3 scale = transform.localScale;
+                scale.x *= -1;
+                transform.localScale = scale;
+            }
+            else if (diff > 0 && facingDirection < 0)
+            {
+                Vector3 scale = transform.localScale;
+                scale.x *= -1;
+                transform.localScale = scale;
+                facingDirection = 1;
+            }
+        }
+
+
+        public void FixedUpdate()
+        {
+            movementUpdate();
+
+
+            if (holdingItem == null)
+                return;
+            
+            
+            Vector2 position = transform.position;
+            Vector2 mousePosition = new Vector2(mouseWorldPosition.x, mouseWorldPosition.y);
+            Vector2 diff = mousePosition - position;
+            diff.Normalize();
+            diff *= itemOffsetDistance;
+
+            if (facingDirection < 0)
+                diff.x *= -1;
+            
+            holdingItem.transformUpdate(diff);
         }
 
 
@@ -120,12 +171,25 @@ namespace Entity
 
         public void mousePositionUpdate(Vector2 mousePosition)
         {
-          //  Debug.Log(mousePosition);
+            Camera mainCamera = Camera.main;
+            if (mainCamera == null)
+            {
+                Debug.Log("Camera main camera not found");
+                return;
+            }
+            mouseWorldPosition = mainCamera.ScreenToWorldPoint(new Vector3(mousePosition.x, mousePosition.y, 0));
         }
 
+        
+        
         public void leftMousePress(float mouseValue)
         {
-          //  Debug.Log("left mouse press");
+            if (holdingItem != null)
+                holdingItem.fire(Time.fixedTime,bulletCount,guid,facingDirection);
+            else
+            {
+                Debug.Log("holdingItem is null");
+            }
         }
 
         public void leftMouseRelease(float mouseValue)
