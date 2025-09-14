@@ -1,152 +1,137 @@
+using System;
 using UnityEngine;
 using System.Collections.Generic;
+using Entity;
+using Unity.VisualScripting;
+using Random = UnityEngine.Random;
 
 public class GameManager : MonoBehaviour
 {
-    public GameObject Platforms;
-    public GameObject guy;
-    public GameObject plat1;
-    public GameObject plat2;
-    public GameObject plat3;
-    public GameObject plat4;
-    public GameObject plat5;
-    public GameObject deathWall;   
+    private GameObject platformPrefab;
+    private Camera mainCamera;
+    
+    [SerializeField] public DeathChaser deathWall;
 
-    public int platformCount = 20;
+    [SerializeField] public Player player;
 
-    Vector3 spawnPosition = new Vector3();
+    [SerializeField] public float platformRise;
+    
+    [SerializeField] public int platformCount = 20;
 
-        private List<GameObject> spawnedPlatforms = new List<GameObject>();
+    [SerializeField] public float eliminationOffset = 5;
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+
+    private float minPlatformHeight;
+    private float height;
+   
+    private Vector3 spawnPosition;
+    private List<GameObject> activePlatforms;
+    
     void Start()
     {
+        platformPrefab = Resources.Load<GameObject>("Platform");
+        spawnPosition = player.transform.position;
+        if (platformPrefab == null)
+            Debug.LogError("No platform prefab found");
 
-        spawnPosition.y += 10; 
-        GameObject newPlatform = Instantiate(plat1, spawnPosition, Quaternion.identity);
-        spawnedPlatforms.Add(newPlatform);
-
-        spawnPosition.y += 10;        
-        newPlatform = Instantiate(plat2, spawnPosition, Quaternion.identity);
-        spawnedPlatforms.Add(newPlatform);
-
-        spawnPosition.y += 10;        
-        newPlatform = Instantiate(plat3, spawnPosition, Quaternion.identity);
-        spawnedPlatforms.Add(newPlatform);
-
-        spawnPosition.y += 10;        
-        newPlatform = Instantiate(plat4, spawnPosition, Quaternion.identity);
-        spawnedPlatforms.Add(newPlatform);
-
-        spawnPosition.y += 10;        
-        newPlatform = Instantiate(plat5, spawnPosition, Quaternion.identity);
-        spawnedPlatforms.Add(newPlatform);
-                spawnPosition.y += 10;        
-        newPlatform = Instantiate(plat2, spawnPosition, Quaternion.identity);
-        spawnedPlatforms.Add(newPlatform);
-
-        spawnPosition.y += 10;        
-        newPlatform = Instantiate(plat3, spawnPosition, Quaternion.identity);
-        spawnedPlatforms.Add(newPlatform);
-
-        spawnPosition.y += 10;        
-        newPlatform = Instantiate(plat4, spawnPosition, Quaternion.identity);
-        spawnedPlatforms.Add(newPlatform);
-
-        spawnPosition.y += 10;        
-        newPlatform = Instantiate(plat5, spawnPosition, Quaternion.identity);
-        spawnedPlatforms.Add(newPlatform);
+        mainCamera = Camera.main;
+        if (mainCamera == null)
+            throw new Exception("No main camera found");
         
-                spawnPosition.y += 10;        
-        newPlatform = Instantiate(plat2, spawnPosition, Quaternion.identity);
-        spawnedPlatforms.Add(newPlatform);
-
-        spawnPosition.y += 10;        
-        newPlatform = Instantiate(plat3, spawnPosition, Quaternion.identity);
-        spawnedPlatforms.Add(newPlatform);
-
-        spawnPosition.y += 10;        
-        newPlatform = Instantiate(plat4, spawnPosition, Quaternion.identity);
-        spawnedPlatforms.Add(newPlatform);
-
-        spawnPosition.y += 10;        
-        newPlatform = Instantiate(plat5, spawnPosition, Quaternion.identity);
-        spawnedPlatforms.Add(newPlatform);
-        
+        activePlatforms = new List<GameObject>();
+        height = player.transform.position.y;
+        minPlatformHeight = player.transform.position.y;
     }
 
-    // Update is called once per frame
+    
     void Update()
     {
+        Transform transform = player.gameObject.transform;
+        float cameraLevel =  Math.Max(transform.position.y, height);
+        minPlatformHeight = Math.Max(cameraLevel, minPlatformHeight);
         
+        mainCamera.transform.position = new Vector3(spawnPosition.x, cameraLevel, mainCamera.transform.position.z);
+
+        if (cameraLevel > height)
+        {
+            height = cameraLevel;
+            worldUpdates();
+        }
+
+        height = cameraLevel;
     }
+
+
+    private void worldUpdates()
+    {
+        int destroyed = removePlatforms();
+        int diff = platformCount - destroyed;
+
+        for (int i = 0; i < diff; i++)
+        {
+            spawnPlatform();
+        }
+    }
+
+
+    //returns the number of platforms removed
+    public int removePlatforms()
+    {
+        if (activePlatforms.Count <= 0)
+            return 0;
+
+        int destroyed = 0;
+        float yLevel = activePlatforms[0].transform.position.y;
+        while (activePlatforms.Count > 0 && (height - yLevel >= eliminationOffset))
+        {
+            GameObject current = activePlatforms[0];
+            yLevel = current.transform.position.y;
+            activePlatforms.RemoveAt(0);
+            Destroy(current);
+            destroyed++;
+        }
+
+        return destroyed;
+    }
+
+    public void spawnPlatform()
+    {
+        if (activePlatforms.Count > platformCount)
+            return;
+        
+        float width = mainCamera.ScreenToWorldPoint(new Vector3(mainCamera.pixelWidth, 0, 0)).x;
+
+        const float RISE_CHANCE = 0.5f;
+        float roll = Random.Range(0, 1);
+       
+        minPlatformHeight += platformRise;
+        
+        float coordinateX = Random.Range(-width, width) + spawnPosition.x;
+        GameObject platform = Instantiate(platformPrefab,new Vector3(coordinateX, minPlatformHeight, 0), Quaternion.identity);
+        activePlatforms.Add(platform);
+    }
+
+
+
     public void OnDeathWallHitPlatform(GameObject platform)
     {
 
-        for (int i = spawnedPlatforms.Count - 1; i >= 0; i--)
-        {
-            if (spawnedPlatforms[i] != null && 
-                spawnedPlatforms[i].transform.position.y < deathWall.transform.position.y)
-            {
-                Destroy(spawnedPlatforms[i]);
-                spawnedPlatforms.RemoveAt(i);
-
-                Debug.Log("Death wall hit platform!");
-                spawnPosition.y += Random.Range(.5f, 10f);
-                spawnPosition.x = Random.Range(-10f, 10f);
-                GameObject newPlatform = Instantiate(plat1, spawnPosition, Quaternion.identity);
-                spawnedPlatforms.Add(newPlatform);
-            }
-        }
-
-        // Debug.Log("diePlat?");
-        // spawnPosition.y += Random.Range(.5f, 10f);
-        // spawnPosition.x = Random.Range(-10f, 10f);
-        // Destroy(collision.gameObject);
-        // GameObject newPlatform = Instantiate(plat1, spawnPosition, Quaternion.identity);
-        // spawnedPlatforms.Add(newPlatform);
-    
+        // for (int i = spawnedPlatforms.Count - 1; i >= 0; i--)
+        // {
+        //     if (spawnedPlatforms[i] != null && 
+        //         spawnedPlatforms[i].transform.position.y < deathWall.transform.position.y)
+        //     {
+        //         Destroy(spawnedPlatforms[i]);
+        //         spawnedPlatforms.RemoveAt(i);
+        //
+        //         Debug.Log("Death wall hit platform!");
+        //         spawnPosition.y += Random.Range(.5f, 10f);
+        //         spawnPosition.x = Random.Range(-10f, 10f);
+        //         GameObject newPlatform = Instantiate(plat1, spawnPosition, Quaternion.identity);
+        //         spawnedPlatforms.Add(newPlatform);
+        //     }
+        // }
     }
-
-        // if( collision.gameObject.tag.Equals("plat1") == true )
-        // {
-        //     spawnPosition.y += Random.Range(.5f, 10f);
-        //     spawnPosition.x = Random.Range(-10f, 10f);
-        //     Destroy(spawnedPlatforms[3]);
-        //     Instantiate(spawnedPlatforms[2], spawnPosition, Quaternion.identity);
-        // }
-
-        // if( collision.gameObject.tag.Equals("plat2") == true )
-        // {
-        //     spawnPosition.y += Random.Range(.5f, 10f);
-        //     spawnPosition.x = Random.Range(-10f, 10f);
-        //     Destroy(spawnedPlatforms[4]);
-        //     Instantiate(spawnedPlatforms[3], spawnPosition, Quaternion.identity);
-        // }
-
-        // if( collision.gameObject.tag.Equals("plat3") == true )
-        // {
-        //     spawnPosition.y += Random.Range(.5f, 10f);
-        //     spawnPosition.x = Random.Range(-10f, 10f);
-        //     Destroy(spawnedPlatforms[0]);
-        //     Instantiate(spawnedPlatforms[4], spawnPosition, Quaternion.identity);
-        // }
-        
-        // if( collision.gameObject.tag.Equals("plat4") == true )
-        // {
-        //     spawnPosition.y += Random.Range(.5f, 10f);
-        //     spawnPosition.x = Random.Range(-10f, 10f);
-        //     Destroy(spawnedPlatforms[1]);
-        //     Instantiate(spawnedPlatforms[0], spawnPosition, Quaternion.identity);
-        // }
-        
-        // if( collision.gameObject.tag.Equals("plat5") == true )
-        // {
-        //     spawnPosition.y += Random.Range(.5f, 10f);
-        //     spawnPosition.x = Random.Range(-10f, 10f);
-        //     Destroy(spawnedPlatforms[2]);
-        //     Instantiate(spawnedPlatforms[1], spawnPosition, Quaternion.identity);
-        // }
 }
 
 
