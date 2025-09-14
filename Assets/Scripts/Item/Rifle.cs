@@ -9,7 +9,7 @@ namespace Item
         
         public Rifle(GameObject reference, LayerMask ground): base(reference, ground)
         {
-            cooldown = 1000;
+            cooldown = 1000; //
             //set the base sprites and animations here based on the gun
         }
 
