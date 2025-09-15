@@ -14,12 +14,8 @@ public class GameManager : MonoBehaviour
     [SerializeField] public float platformRise;
     
     [SerializeField] public int platformCount = 40;
-
-    [SerializeField] public float eliminationOffset = 5;
     
-
-
-
+    private float eliminationPoint;
     private float minPlatformHeight;
     private float height;
     
@@ -47,10 +43,22 @@ public class GameManager : MonoBehaviour
     void Update()
     {
         Transform transform = player.gameObject.transform;
-        float cameraLevel =  Math.Max(transform.position.y, height);
+        float cameraLevel =  Math.Max(transform.position.y, height); //height is the camera height
         minPlatformHeight = Math.Max(cameraLevel, minPlatformHeight);
         
         mainCamera.transform.position = new Vector3(spawnPosition.x, cameraLevel, mainCamera.transform.position.z);
+        
+
+        float cameraMin = mainCamera.ScreenToWorldPoint(new Vector3(0, mainCamera.pixelHeight, 0)).y;
+        float diff = cameraMin - mainCamera.transform.position.y;
+        eliminationPoint = mainCamera.transform.position.y - diff;
+
+        if (transform.position.y < eliminationPoint)
+        {
+            Debug.Log("game over");
+            player.die();
+        }
+
 
         if (cameraLevel > height)
         {
@@ -88,8 +96,9 @@ public class GameManager : MonoBehaviour
 
         int destroyed = 0;
         float yLevel = activePlatforms[0].transform.position.y;
-        while (activePlatforms.Count > 0 && (height - yLevel >= eliminationOffset))
+        while (activePlatforms.Count > 0 && (yLevel < eliminationPoint))
         {
+            Debug.Log(yLevel +" "+eliminationPoint);
             GameObject current = activePlatforms[0];
             yLevel = current.transform.position.y;
             activePlatforms.RemoveAt(0);
