@@ -87,6 +87,7 @@ namespace Entity
 
         public override void die()
         {
+            
           //do something related to a game over state here
         }
 
