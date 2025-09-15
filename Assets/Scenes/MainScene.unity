@@ -141,11 +141,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6531685027517961476, guid: 0fbe71ed0f179b54e9c11bfb50eb04d8, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -0.758819
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6531685027517961476, guid: 0fbe71ed0f179b54e9c11bfb50eb04d8, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 1.22
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 6531685027517961476, guid: 0fbe71ed0f179b54e9c11bfb50eb04d8, type: 3}
       propertyPath: m_LocalPosition.z
@@ -268,11 +268,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 92f811a24f77341ffb8c9799455d9e5e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameManager
-  deathWall: {fileID: 0}
   player: {fileID: 73858064}
-  platformRise: 5
+  platformRise: 1.5
   platformCount: 20
-  eliminationOffset: 5
+  eliminationOffset: 10
 --- !u!4 &1395575164
 Transform:
   m_ObjectHideFlags: 0
@@ -556,7 +555,7 @@ Transform:
   m_GameObject: {fileID: 6972612049438775145}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.014105886, y: 3.37, z: -10}
+  m_LocalPosition: {x: 0, y: 3, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
