@@ -85,8 +85,22 @@ namespace Item
                     return false;
                 
                 lastFireTime = (int)fixedTime * 1000;
+
+                const float OFFSET_RADS = 15 * Mathf.PI / 180f;
+                float leftBulletX = (float)Math.Cos(radDegrees - OFFSET_RADS) * hypotenuse;
+                float leftBulletY = (float)Math.Sin(radDegrees - OFFSET_RADS) * hypotenuse;
+                
+                float rightBulletX = (float)Math.Cos(radDegrees + OFFSET_RADS) * hypotenuse;
+                float rightBulletY = (float)Math.Sin(radDegrees + OFFSET_RADS) * hypotenuse;
+
+                Vector2 leftBulletDir = new Vector2(leftBulletX, leftBulletY).normalized;
+                Vector2 rightBulletDir = new Vector2(rightBulletX, rightBulletY).normalized;
+                leftBulletDir.x *= facingDirection;
+                rightBulletDir.x *= facingDirection;
                 
                 EntityFactory.createProjectile(spawnPosition, player.getID(), direction, SPEED);
+                EntityFactory.createProjectile(spawnPosition, player.getID(), leftBulletDir, SPEED);
+                EntityFactory.createProjectile(spawnPosition, player.getID(), rightBulletDir, SPEED);
 
                 Vector2 recoil = direction * (-10 * (power));
                 player.push(recoil);
