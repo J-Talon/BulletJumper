@@ -10,20 +10,20 @@ public class GameManager : MonoBehaviour
     private GameObject platformPrefab;
     private Camera mainCamera;
     
-    [SerializeField] public DeathChaser deathWall;
-
     [SerializeField] public Player player;
 
     [SerializeField] public float platformRise;
     
-    [SerializeField] public int platformCount = 20;
+    [SerializeField] public int platformCount = 40;
 
     [SerializeField] public float eliminationOffset = 5;
+    
+
 
 
     private float minPlatformHeight;
     private float height;
-   
+    
     private Vector3 spawnPosition;
     private List<GameObject> activePlatforms;
     
@@ -41,6 +41,7 @@ public class GameManager : MonoBehaviour
         activePlatforms = new List<GameObject>();
         height = player.transform.position.y;
         minPlatformHeight = player.transform.position.y;
+        worldUpdates();
     }
 
     
@@ -59,6 +60,14 @@ public class GameManager : MonoBehaviour
         }
 
         height = cameraLevel;
+        
+        float width = mainCamera.ScreenToWorldPoint(new Vector3(mainCamera.pixelWidth, 0, 0)).x - 1;
+
+        int reflect = transform.position.x > 0 ? -1 : 1;
+        float boundary = Math.Abs(transform.position.x);
+        if (boundary >= width)
+            player.push(new Vector2(reflect * 7,0)); //7 is arbitrary (the number that seems to work well-ish)
+        
     }
 
 
@@ -68,9 +77,7 @@ public class GameManager : MonoBehaviour
         int diff = platformCount - destroyed;
 
         for (int i = 0; i < diff; i++)
-        {
-            spawnPlatform();
-        }
+            generateWorld();
     }
 
 
@@ -94,21 +101,34 @@ public class GameManager : MonoBehaviour
         return destroyed;
     }
 
-    public void spawnPlatform()
+    public void generateWorld()
     {
         if (activePlatforms.Count > platformCount)
             return;
         
-        float width = mainCamera.ScreenToWorldPoint(new Vector3(mainCamera.pixelWidth, 0, 0)).x;
-
-        const float RISE_CHANCE = 0.5f;
-        float roll = Random.Range(0, 1);
+        float width = mainCamera.ScreenToWorldPoint(new Vector3(mainCamera.pixelWidth, 0, 0)).x - 1;
        
         minPlatformHeight += platformRise;
         
-        float coordinateX = Random.Range(-width, width) + spawnPosition.x;
-        GameObject platform = Instantiate(platformPrefab,new Vector3(coordinateX, minPlatformHeight, 0), Quaternion.identity);
+        float coordinateX = (int)(Random.Range(-width, width) + spawnPosition.x);
+        GameObject platform = Instantiate(platformPrefab,new Vector3(coordinateX, (int)minPlatformHeight, 0), Quaternion.identity);
+
+        float roll = Random.value;
+        const float THRESHOLD = 0.7f;
+
+        GameObject platform2 = null;
+        if (roll > THRESHOLD)
+        {
+            float direction = Random.value;
+            int offset = direction > 0.5f ? 1 : -1;
+            platform2 = Instantiate(platformPrefab, new Vector3(coordinateX + (offset * platformPrefab.transform.localScale.x), (int)minPlatformHeight,0),
+                Quaternion.identity);
+        }
+        
         activePlatforms.Add(platform);
+        if (platform2 != null)
+            activePlatforms.Add(platform2);
+        
     }
 
 
