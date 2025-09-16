@@ -32,7 +32,8 @@ public class SoundManager : MonoBehaviour
         return gameObject.transform.childCount - 1;
     }
 
-    public int numChannels()
+    //returns the number of active sound channels 
+    public int activeChannels()
     {
         return gameObject.transform.childCount;
     }
@@ -47,6 +48,8 @@ public class SoundManager : MonoBehaviour
     }
 
     //The sound file must be in the Resources folder
+    //if your sound is gun.mp3, use SoundManager.instance.playSound("gun")
+    //this assumes that gun.mp3 is in Resources/SoundEffects
     public bool playSound(String name)
     {
         return playSound(name, 0);
@@ -55,6 +58,11 @@ public class SoundManager : MonoBehaviour
     public bool playSound(String name, int channel)
     {
         AudioClip clip = Resources.Load<AudioClip>(PATH+"/"+name);
+        if (clip == null)
+        {
+            return false;
+        }
+
         return playSound(clip, channel);
     }
 
@@ -64,6 +72,7 @@ public class SoundManager : MonoBehaviour
         if (source == null)
             return false;
         source.clip = clip;
+        
         source.Play();
         return true;
     }
