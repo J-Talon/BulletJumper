@@ -145,9 +145,12 @@ public class GameManager : MonoBehaviour
         ammoSpawn += 1;
         if (ammoSpawn == ammoAmount)
         {
-        GameObject ammo = Instantiate(ammoPrefab,new Vector3(coordinateX, (int)minPlatformHeight + 1, 0), Quaternion.identity);
+        GameObject ammoDrop = Instantiate(ammoPrefab,new Vector3(coordinateX, (int)minPlatformHeight + 1, 0), Quaternion.identity);
         ammoSpawn =0;
+        //activeAmmo.Add(ammoDrop);
         }
+
+        
 //////////////////////
         float roll = Random.value;
         const float THRESHOLD = 0.7f;
@@ -167,6 +170,16 @@ public class GameManager : MonoBehaviour
         
     }
 
+    // public void ammoCollected(GameObject other)
+    // {
+    //     for (int i = 0; i >= activeAmmo.Count-1; i++)
+    //     {
+    //         if (activeAmmo[i] == other)
+    //         {
+    //             Destroy(activeAmmo[i]);
+    //         }
+    //     }
+    // }
 
 
     public void OnDeathWallHitPlatform(GameObject platform)
