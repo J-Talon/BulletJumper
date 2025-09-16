@@ -8,6 +8,6 @@ public class Startup
     static void OnGameStart()
     {
         SceneManager.LoadScene("Scenes/ConstantLoad");
-        SceneManager.LoadScene("Scenes/UI_prototype");
+        SceneManager.LoadScene("Scenes/Generation");
     }
 }
