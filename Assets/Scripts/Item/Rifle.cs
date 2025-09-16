@@ -35,7 +35,6 @@ namespace Item
                 power++;
             
             
-            
             const float SPEED = 8;
             GameObject reference = base.renderer;
             Transform form = reference.transform;
@@ -65,25 +64,34 @@ namespace Item
             if (power < 1)
             {
                 if (!canFire(fixedTime, bullets))
+                {
+                    SoundManager.instance.playSound("click");
                     return false;
-                
+                }
+
                 lastFireTime = (int)fixedTime * 1000;
                 EntityFactory.createProjectile(spawnPosition, player.getID(), direction, SPEED);
 
                 Vector2 recoil = direction * -10;
                 player.push(recoil);
                 animator.SetTrigger("onFire");
-            
+                SoundManager.instance.playSound("shot");
                 return true;
             }
             else
             {
                 if (!canFire(fixedTime, bullets))
+                {
+                    SoundManager.instance.playSound("click");
                     return false;
+                }
 
                 if (!(bullets >= power))
+                {
+                    SoundManager.instance.playSound("click");
                     return false;
-                
+                }
+
                 lastFireTime = (int)fixedTime * 1000;
 
                 const float OFFSET_RADS = 15 * Mathf.PI / 180f;
@@ -104,6 +112,8 @@ namespace Item
 
                 Vector2 recoil = direction * (-10 * (power));
                 player.push(recoil);
+                
+                SoundManager.instance.playSound("shot");
                 animator.SetTrigger("onFire");
                 return true;
             }
