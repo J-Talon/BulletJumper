@@ -52,7 +52,7 @@ TextureImporter:
   maxTextureSize: 2048
   textureSettings:
     serializedVersion: 2
-    filterMode: 1
+    filterMode: 0
     aniso: 1
     mipBias: 0
     wrapU: 1
@@ -66,7 +66,7 @@ TextureImporter:
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 100
+  spritePixelsToUnits: 32
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -115,7 +115,7 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: ranger_0
+      name: Ranger_Idle_1
       rect:
         serializedVersion: 2
         x: 5
@@ -137,7 +137,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: ranger_1
+      name: ranger_Idle_2
       rect:
         serializedVersion: 2
         x: 37
@@ -159,7 +159,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: ranger_2
+      name: ranger_Jump
       rect:
         serializedVersion: 2
         x: 69
@@ -181,7 +181,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: ranger_3
+      name: ranger_Move_1
       rect:
         serializedVersion: 2
         x: 5
@@ -203,7 +203,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: ranger_4
+      name: ranger_Move_2
       rect:
         serializedVersion: 2
         x: 37
@@ -225,7 +225,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: ranger_5
+      name: ranger_Move_3
       rect:
         serializedVersion: 2
         x: 69
@@ -262,12 +262,12 @@ TextureImporter:
       - key: SpriteEditor.SliceSettings
         value: '{"sliceOnImport":false,"gridCellCount":{"x":1.0,"y":1.0},"gridSpriteSize":{"x":64.0,"y":64.0},"gridSpriteOffset":{"x":0.0,"y":0.0},"gridSpritePadding":{"x":0.0,"y":0.0},"pivot":{"x":0.5,"y":0.5},"pivotPixels":{"x":0.0,"y":0.0},"autoSlicingMethod":0,"spriteAlignment":0,"pivotUnitMode":0,"slicingType":0,"keepEmptyRects":false,"isAlternate":false}'
     nameFileIdTable:
-      ranger_0: -2850707533075056667
-      ranger_1: 2747413984754389643
-      ranger_2: 1004050130200608572
-      ranger_3: -222546025886523532
-      ranger_4: 2340934481643061458
-      ranger_5: 8341342036968747797
+      Ranger_Idle_1: -2850707533075056667
+      ranger_Idle_2: 2747413984754389643
+      ranger_Jump: 1004050130200608572
+      ranger_Move_1: -222546025886523532
+      ranger_Move_2: 2340934481643061458
+      ranger_Move_3: 8341342036968747797
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
