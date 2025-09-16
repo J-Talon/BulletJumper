@@ -2,6 +2,7 @@
 using Input;
 using Item;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace Entity
 {
@@ -89,6 +90,8 @@ namespace Entity
         {
             
           //do something related to a game over state here
+          ((InputListener)this).unsubscribe();
+            SceneManager.LoadSceneAsync("Scenes/EndCard");
         }
 
         
