@@ -14,8 +14,18 @@ public class GameManager : MonoBehaviour
     [SerializeField] public float platformRise;
     
     [SerializeField] public int platformCount = 40;
-    
+
+    [SerializeField] public float eliminationOffset = 5;
+
     private float eliminationPoint;
+    
+   [SerializeField] public int ammoAmount = 5;
+
+    private int ammoSpawn;
+    private GameObject ammoPrefab;
+    private List<GameObject> activeAmmo;
+
+
     private float minPlatformHeight;
     private float height;
     
@@ -29,9 +39,19 @@ public class GameManager : MonoBehaviour
         if (platformPrefab == null)
             Debug.LogError("No platform prefab found");
 
+//////////////////////////////         
+        ammoSpawn = 0; 
+        ammoPrefab = Resources.Load<GameObject>("Ammo");
+
+        if (ammoPrefab == null)
+            Debug.LogError("No bullet prefab found");
+//////////////////////////////              
+
         mainCamera = Camera.main;
         if (mainCamera == null)
             throw new Exception("No main camera found");
+        
+
         
         activePlatforms = new List<GameObject>();
         height = player.transform.position.y;
@@ -120,7 +140,15 @@ public class GameManager : MonoBehaviour
         
         float coordinateX = (int)(Random.Range(-width, width) + spawnPosition.x);
         GameObject platform = Instantiate(platformPrefab,new Vector3(coordinateX, (int)minPlatformHeight, 0), Quaternion.identity);
-
+ 
+ /////////////////////
+        ammoSpawn += 1;
+        if (ammoSpawn == ammoAmount)
+        {
+        GameObject ammo = Instantiate(ammoPrefab,new Vector3(coordinateX, (int)minPlatformHeight + 1, 0), Quaternion.identity);
+        ammoSpawn =0;
+        }
+//////////////////////
         float roll = Random.value;
         const float THRESHOLD = 0.7f;
 
