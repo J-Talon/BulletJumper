@@ -76,6 +76,7 @@ namespace Item
                 player.push(recoil);
                 animator.SetTrigger("onFire");
                 SoundManager.instance.playSound("shot");
+                player.setPlayerBullets(bullets - 1);
                 return true;
             }
             else
@@ -115,6 +116,7 @@ namespace Item
                 
                 SoundManager.instance.playSound("shot");
                 animator.SetTrigger("onFire");
+                player.setPlayerBullets(bullets - power);
                 return true;
             }
         }
