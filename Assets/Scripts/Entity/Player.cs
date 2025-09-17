@@ -2,6 +2,8 @@
 using Input;
 using Item;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+using UnityEngine.UIElements;
 
 namespace Entity
 {
@@ -47,9 +49,14 @@ namespace Entity
         
         //distance to perform the raycast
         [SerializeField] public float castDistance;
+
+        public UIDocument uiDocument;
+        private Label ammoText;
         
         public void Start()
         {
+
+            ammoText = uiDocument.rootVisualElement.Q<Label>("AmmoCount");
             base.initID();
             ((InputListener)this).subscribe();
             rigidBody = GetComponent<Rigidbody2D>();
@@ -89,6 +96,8 @@ namespace Entity
         {
             
           //do something related to a game over state here
+          ((InputListener)this).unsubscribe();
+            SceneManager.LoadSceneAsync("Scenes/EndCard");
         }
 
         
@@ -251,14 +260,19 @@ namespace Entity
             impulsePush += vector;
         }
 
-        void OnTriggerEnter2D(Collider2D other) {
-        if (other.CompareTag("ammo")) {
-                Debug.Log("Picked up ammo! total mag =");
-                Debug.Log(bulletCount);
-                bulletCount += (startingBullets);
 
-                // GameManager.ammoCollected(other);
-        } 
+
+        void OnTriggerEnter2D(Collider2D other) {
+        if (other.CompareTag("ammo"))
+        {
+
+            ammoText.text = "Ammo: " + bulletCount;
+
+            Debug.Log("Picked up ammo! total mag =");
+            Debug.Log(bulletCount);
+            bulletCount += (startingBullets);
+
+            // GameManager.ammoCollected(other);
         }
     }
 
