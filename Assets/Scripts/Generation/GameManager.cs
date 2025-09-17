@@ -27,16 +27,16 @@ public class GameManager : MonoBehaviour
     private float minPlatformHeight;
     private float height;
 
-    public UIDocument uiDocument;
-    public Label scoreText;
-    public int score;
+    //public UIDocument uiDocument;
+    //public Label scoreText;
+    //public int score;
     
     private Vector3 spawnPosition;
     private List<GameObject> activePlatforms;
     
     void Start()
     {
-        scoreText = uiDocument.rootVisualElement.Q<Label>("ScoreLabel");
+       // scoreText = uiDocument.rootVisualElement.Q<Label>("ScoreLabel");
         platformPrefab = Resources.Load<GameObject>("Platform");
         spawnPosition = player.transform.position;
         if (platformPrefab == null)
@@ -87,9 +87,11 @@ public class GameManager : MonoBehaviour
         if (cameraLevel > height)
         {
             height = cameraLevel;
-            score = Mathf.FloorToInt(height);
-            scoreText.text = "Score: " + score;
-            ScoreManager.Instance.AddScore(score);
+           // score = Mathf.FloorToInt(height);
+           // scoreText.text = "Score: " + score;
+            
+           // Debug.Log(ScoreManager.Instance);
+          //  ScoreManager.Instance.AddScore(score);
             worldUpdates();
         }
 
@@ -123,10 +125,19 @@ public class GameManager : MonoBehaviour
 
         if (activeAmmo.Count > 0)
         {
-            float ammoLevel = activeAmmo[0].transform.position.y;
-            while (activeAmmo.Count > 0 && (ammoLevel < eliminationPoint))
+            float ammoLevel = activeAmmo[0] == null ? float.NaN : activeAmmo[0].transform.position.y;
+            while (activeAmmo.Count > 0)
             {
-                Debug.Log(ammoLevel +" "+eliminationPoint);
+
+                if (Single.IsNaN(ammoLevel))
+                {
+                    activeAmmo.RemoveAt(0);
+                    continue;
+                }
+
+                if (ammoLevel < eliminationPoint)
+                    break;
+                
                 GameObject currentAmmo = activeAmmo[0];
                 ammoLevel = currentAmmo.transform.position.y;
 

@@ -50,13 +50,13 @@ namespace Entity
         //distance to perform the raycast
         [SerializeField] public float castDistance;
 
-        public UIDocument uiDocument;
-        private Label ammoText;
+        //public UIDocument uiDocument;
+        //private Label ammoText;
         
         public void Start()
         {
 
-            ammoText = uiDocument.rootVisualElement.Q<Label>("AmmoCount");
+            //ammoText = uiDocument.rootVisualElement.Q<Label>("AmmoCount");
             base.initID();
             ((InputListener)this).subscribe();
             rigidBody = GetComponent<Rigidbody2D>();
@@ -255,6 +255,11 @@ namespace Entity
             return bulletCount;
         }
 
+        public void setPlayerBullets(int bulletCount)
+        {
+            this.bulletCount = bulletCount;
+        }
+
         public void push(Vector2 vector)
         {
             impulsePush += vector;
@@ -262,17 +267,16 @@ namespace Entity
 
 
 
-        void OnTriggerEnter2D(Collider2D other) {
-        if (other.CompareTag("ammo"))
+        void OnTriggerEnter2D(Collider2D other)
         {
+            if (other.CompareTag("ammo"))
+            {
 
-            ammoText.text = "Ammo: " + bulletCount;
+               // ammoText.text = "Ammo: " + bulletCount;
+                bulletCount += (startingBullets);
 
-            Debug.Log("Picked up ammo! total mag =");
-            Debug.Log(bulletCount);
-            bulletCount += (startingBullets);
-
-            // GameManager.ammoCollected(other);
+                // GameManager.ammoCollected(other);
+            }
         }
     }
 
