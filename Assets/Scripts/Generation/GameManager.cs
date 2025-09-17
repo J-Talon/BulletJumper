@@ -3,6 +3,7 @@ using UnityEngine;
 using System.Collections.Generic;
 using Entity;
 using Random = UnityEngine.Random;
+using UnityEngine.UIElements;
 
 public class GameManager : MonoBehaviour
 {
@@ -28,12 +29,17 @@ public class GameManager : MonoBehaviour
 
     private float minPlatformHeight;
     private float height;
+
+    public UIDocument uiDocument;
+    public Label scoreText;
+    public int score;
     
     private Vector3 spawnPosition;
     private List<GameObject> activePlatforms;
     
     void Start()
     {
+        scoreText = uiDocument.rootVisualElement.Q<Label>("ScoreLabel");
         platformPrefab = Resources.Load<GameObject>("Platform");
         spawnPosition = player.transform.position;
         if (platformPrefab == null)
@@ -83,6 +89,9 @@ public class GameManager : MonoBehaviour
         if (cameraLevel > height)
         {
             height = cameraLevel;
+            score = Mathf.FloorToInt(height);
+            scoreText.text = "Score: " + score;
+            ScoreManager.Instance.AddScore(score);
             worldUpdates();
         }
 
@@ -100,6 +109,8 @@ public class GameManager : MonoBehaviour
 
     private void worldUpdates()
     {
+        
+
         int destroyed = removePlatforms();
         int diff = platformCount - destroyed;
 

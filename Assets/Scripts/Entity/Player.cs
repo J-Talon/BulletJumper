@@ -3,6 +3,7 @@ using Input;
 using Item;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UIElements;
 
 namespace Entity
 {
@@ -48,9 +49,14 @@ namespace Entity
         
         //distance to perform the raycast
         [SerializeField] public float castDistance;
+
+        public UIDocument uiDocument;
+        private Label ammoText;
         
         public void Start()
         {
+
+            ammoText = uiDocument.rootVisualElement.Q<Label>("AmmoCount");
             base.initID();
             ((InputListener)this).subscribe();
             rigidBody = GetComponent<Rigidbody2D>();
@@ -258,6 +264,9 @@ namespace Entity
     {
         if (other.CompareTag("ammo"))
         {
+
+            ammoText.text = "Ammo: " + bulletCount;
+
             Debug.Log("Picked up ammo! total mag =");
             Debug.Log(bulletCount);
             bulletCount += (startingBullets);
