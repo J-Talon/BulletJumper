@@ -260,8 +260,9 @@ namespace Entity
             impulsePush += vector;
         }
 
-        void OnTriggerEnter2D(Collider2D other)
-    {
+
+
+        void OnTriggerEnter2D(Collider2D other) {
         if (other.CompareTag("ammo"))
         {
 
@@ -272,10 +273,7 @@ namespace Entity
             bulletCount += (startingBullets);
 
             // GameManager.ammoCollected(other);
-
         }
-    }
-
     }
 
 }
