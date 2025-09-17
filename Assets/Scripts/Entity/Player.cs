@@ -251,19 +251,15 @@ namespace Entity
             impulsePush += vector;
         }
 
-        void OnTriggerEnter2D(Collider2D other)
-    {
-        if (other.CompareTag("ammo"))
-        {
-            Debug.Log("Picked up ammo! total mag =");
-            Debug.Log(bulletCount);
-            bulletCount += (startingBullets);
+        void OnTriggerEnter2D(Collider2D other) {
+        if (other.CompareTag("ammo")) {
+                Debug.Log("Picked up ammo! total mag =");
+                Debug.Log(bulletCount);
+                bulletCount += (startingBullets);
 
-            // GameManager.ammoCollected(other);
-
+                // GameManager.ammoCollected(other);
+        } 
         }
-    }
-
     }
 
 }

@@ -15,13 +15,10 @@ public class GameManager : MonoBehaviour
     
     [SerializeField] public int platformCount = 40;
 
-    [SerializeField] public float eliminationOffset = 5;
-
+    [SerializeField] public int ammoAmount = 5;
+    
     private float eliminationPoint;
     
-   [SerializeField] public int ammoAmount = 5;
-
-    private int ammoSpawn;
     private GameObject ammoPrefab;
     private List<GameObject> activeAmmo;
 
@@ -40,7 +37,6 @@ public class GameManager : MonoBehaviour
             Debug.LogError("No platform prefab found");
 
 //////////////////////////////         
-        ammoSpawn = 0; 
         ammoPrefab = Resources.Load<GameObject>("Ammo");
 
         if (ammoPrefab == null)
@@ -54,6 +50,8 @@ public class GameManager : MonoBehaviour
 
         
         activePlatforms = new List<GameObject>();
+        activeAmmo = new List<GameObject>();
+        
         height = player.transform.position.y;
         minPlatformHeight = player.transform.position.y;
         worldUpdates();
@@ -96,7 +94,7 @@ public class GameManager : MonoBehaviour
             player.push(new Vector2(reflect * 7,0)); //7 is arbitrary (the number that seems to work well-ish)
         
     }
-
+    
 
     private void worldUpdates()
     {
@@ -111,6 +109,24 @@ public class GameManager : MonoBehaviour
     //returns the number of platforms removed
     public int removePlatforms()
     {
+
+        if (activeAmmo.Count > 0)
+        {
+            float ammoLevel = activeAmmo[0].transform.position.y;
+            while (activeAmmo.Count > 0 && (ammoLevel < eliminationPoint))
+            {
+                Debug.Log(ammoLevel +" "+eliminationPoint);
+                GameObject currentAmmo = activeAmmo[0];
+                ammoLevel = currentAmmo.transform.position.y;
+
+                if (ammoLevel >= eliminationPoint)
+                    break;
+                
+                activeAmmo.RemoveAt(0);
+                Destroy(currentAmmo);
+            }
+        }
+
         if (activePlatforms.Count <= 0)
             return 0;
 
@@ -118,9 +134,12 @@ public class GameManager : MonoBehaviour
         float yLevel = activePlatforms[0].transform.position.y;
         while (activePlatforms.Count > 0 && (yLevel < eliminationPoint))
         {
-            Debug.Log(yLevel +" "+eliminationPoint);
             GameObject current = activePlatforms[0];
             yLevel = current.transform.position.y;
+
+            if (yLevel >= eliminationPoint)
+                break;
+            
             activePlatforms.RemoveAt(0);
             Destroy(current);
             destroyed++;
@@ -140,18 +159,16 @@ public class GameManager : MonoBehaviour
         
         float coordinateX = (int)(Random.Range(-width, width) + spawnPosition.x);
         GameObject platform = Instantiate(platformPrefab,new Vector3(coordinateX, (int)minPlatformHeight, 0), Quaternion.identity);
- 
- /////////////////////
-        ammoSpawn += 1;
-        if (ammoSpawn == ammoAmount)
-        {
-        GameObject ammoDrop = Instantiate(ammoPrefab,new Vector3(coordinateX, (int)minPlatformHeight + 1, 0), Quaternion.identity);
-        ammoSpawn =0;
-        //activeAmmo.Add(ammoDrop);
-        }
-
         
-//////////////////////
+        
+        bool ammoSpawnChance = (Random.value) > 0.7f;
+        if (activeAmmo.Count < ammoAmount && ammoSpawnChance)
+        {
+            GameObject ammoDrop = Instantiate(ammoPrefab,new Vector3(coordinateX, (int)minPlatformHeight + 1, 0), Quaternion.identity);
+            activeAmmo.Add(ammoDrop);
+        }
+        
+        
         float roll = Random.value;
         const float THRESHOLD = 0.7f;
 
