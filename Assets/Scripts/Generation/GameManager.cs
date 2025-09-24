@@ -102,7 +102,7 @@ public class GameManager : MonoBehaviour
         int reflect = transform.position.x > 0 ? -1 : 1;
         float boundary = Math.Abs(transform.position.x);
         if (boundary >= width)
-            player.push(new Vector2(reflect * 7,0)); //7 is arbitrary (the number that seems to work well-ish)
+            player.push(new Vector2(reflect * 7,0),0.5f); //7 is arbitrary (the number that seems to work well-ish)
         
     }
     
@@ -123,31 +123,25 @@ public class GameManager : MonoBehaviour
     public int removePlatforms()
     {
 
-        if (activeAmmo.Count > 0)
+        while (activeAmmo.Count > 0)
         {
-            float ammoLevel = activeAmmo[0] == null ? float.NaN : activeAmmo[0].transform.position.y;
-            while (activeAmmo.Count > 0)
+            GameObject ammoPickup = activeAmmo[0];
+            if (ammoPickup == null)
             {
-
-                if (Single.IsNaN(ammoLevel))
-                {
-                    activeAmmo.RemoveAt(0);
-                    continue;
-                }
-
-                if (ammoLevel < eliminationPoint)
-                    break;
-                
-                GameObject currentAmmo = activeAmmo[0];
-                ammoLevel = currentAmmo.transform.position.y;
-
-                if (ammoLevel >= eliminationPoint)
-                    break;
-                
                 activeAmmo.RemoveAt(0);
-                Destroy(currentAmmo);
+                continue;
             }
+            
+            float pickupYCoord = ammoPickup.transform.position.y;
+            if (pickupYCoord >= eliminationPoint)
+                break;
+
+            activeAmmo.RemoveAt(0);
+            Destroy(ammoPickup);
+
         }
+        
+        
 
         if (activePlatforms.Count <= 0)
             return 0;
