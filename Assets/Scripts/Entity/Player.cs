@@ -1,6 +1,7 @@
 ﻿using System;
 using Input;
 using Item;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UIElements;
@@ -13,6 +14,7 @@ namespace Entity
 
         private const float MOVE_SPEED = 5;
         private const float HOR_MAX_SPEED = 6;
+        private const float HOR_ACCELERATION_SCALE = 7.07f;
         
         private bool onGround;
         private int facingDirection;
@@ -22,6 +24,10 @@ namespace Entity
         private int bulletCount;
 
         private Vector2 moveAxis;
+        private float axisConstantSeconds;
+        private float axisMagnitude;
+        private float lockTime;
+        
         private Rigidbody2D rigidBody;
         private Animator animator;
         private Vector2 impulsePush;
@@ -69,8 +75,14 @@ namespace Entity
 
             itemRenderer = transform.GetChild(0).gameObject;
             holdingItem = new Rifle(itemRenderer, layerMask);
+            itemRenderer.GetComponent<SpriteRenderer>().sortingOrder += 1;
+            
             mouseDownTime = 0;
             impulsePush = Vector2.zero;
+            
+            axisConstantSeconds = 0;
+            axisMagnitude = 0;
+            lockTime = 0;
 
             if (itemOffsetDistance <= 0)
                 itemOffsetDistance = 1;
@@ -94,27 +106,25 @@ namespace Entity
 
         public override void die()
         {
-            
           //do something related to a game over state here
           ((InputListener)this).unsubscribe();
-            SceneManager.LoadSceneAsync("Scenes/EndCard");
+          SceneManager.LoadSceneAsync("Scenes/EndCard");
         }
 
         
 
         private void movementUpdate()
         {
-            float transformX = transform.position.x;
-            float transformY = transform.position.y;
-            Vector2 separationLeft = new Vector2(transformX - castSeparation, transformY + verticalCastOffset);
-            Vector2 separationRight = new Vector2(transformX + castSeparation, transformY + verticalCastOffset);
-
-            bool castLeft = Physics2D.Raycast(separationLeft, Vector2.down, castDistance, layerMask);
-            bool castRight = Physics2D.Raycast(separationRight, Vector2.down, castDistance, layerMask);
-
             
-            onGround = (castLeft || castRight);
-            animator.SetBool("onGround",onGround);
+            bool zero = (moveAxis.x == 0 && moveAxis.y == 0);
+            float movementDelta = 0;
+
+            if (zero)
+            {
+                axisConstantSeconds = Time.fixedTime;
+                axisMagnitude = 0;
+            }
+   
             
             if (moveAxis.x == 0)
                 animator.SetBool("isMoving", false);
@@ -128,20 +138,37 @@ namespace Entity
             {
                 Vector2 groundMovement = new Vector2(moveAxis.x * MOVE_SPEED + impulsePush.x, velocity.y + impulsePush.y);
 
-                if (moveAxis.x == 0 && moveAxis.y != 0)
-                    groundMovement.y = moveAxis.y * MOVE_SPEED;
-                else if (moveAxis.x != 0 && moveAxis.y != 0)
+                if (moveAxis.x == 0)
+                {
+                    if (moveAxis.y != 0)
+                        groundMovement.y = moveAxis.y * MOVE_SPEED;
+                }
+                else
                 {
                     //this fixes an issue where moving and jumping makes the player jump lower
-                    groundMovement.y = moveAxis.y * MOVE_SPEED * 1.5f;
+                    if (moveAxis.y != 0)
+                        groundMovement.y = moveAxis.y * MOVE_SPEED * 1.5f;
                 }
                 
                 rigidBody.linearVelocity = groundMovement;
             }
             else
             {
+                //gradual movement physics
+                //m = max speed
+                //s = acc
+                float axisTime = Time.fixedTime - axisConstantSeconds;
 
-                float inAirMovementX = moveAxis.x * MOVE_SPEED + velocity.x + impulsePush.x;
+                if (lockTime > 0)
+                    axisMagnitude = 0;
+                else
+                    axisMagnitude = (float)Math.Min(axisTime, Math.Pow(MOVE_SPEED / HOR_ACCELERATION_SCALE,2));
+                lockTime = Math.Max(0,lockTime - (Time.fixedDeltaTime / Time.timeScale));
+                
+                movementDelta = (float)Math.Min(HOR_ACCELERATION_SCALE * Math.Sqrt(axisMagnitude),MOVE_SPEED);
+                
+                
+                float inAirMovementX = moveAxis.x * movementDelta + velocity.x + impulsePush.x;
                 inAirMovementX = Math.Min(HOR_MAX_SPEED, inAirMovementX);
                 inAirMovementX = Math.Max(-HOR_MAX_SPEED, inAirMovementX);
                 
@@ -149,7 +176,29 @@ namespace Entity
             }
             
             impulsePush = Vector2.zero;
+            
+            
+        }
 
+
+        private void groundChecks()
+        {
+            float transformX = transform.position.x;
+            float transformY = transform.position.y;
+            Vector2 separationLeft = new Vector2(transformX - castSeparation, transformY + verticalCastOffset);
+            Vector2 separationRight = new Vector2(transformX + castSeparation, transformY + verticalCastOffset);
+
+            bool castLeft = Physics2D.Raycast(separationLeft, Vector2.down, castDistance, layerMask);
+            bool castRight = Physics2D.Raycast(separationRight, Vector2.down, castDistance, layerMask);
+
+            
+            onGround = (castLeft || castRight);
+            animator.SetBool("onGround",onGround);
+        }
+
+
+        private void directionUpdate()
+        {
             float diff = mouseWorldPosition.x - transform.position.x;
             
             if (diff < 0 && facingDirection > 0)
@@ -169,14 +218,10 @@ namespace Entity
         }
 
 
-        public void FixedUpdate()
+        private void itemProceduralAnimation()
         {
-            movementUpdate();
-
-
             if (holdingItem == null)
                 return;
-            
             
             Vector2 position = transform.position;
             Vector2 mousePosition = new Vector2(mouseWorldPosition.x, mouseWorldPosition.y);
@@ -188,6 +233,49 @@ namespace Entity
                 diff.x *= -1;
             
             holdingItem.transformUpdate(diff);
+        }
+
+        
+        
+        void OnTriggerEnter2D(Collider2D other)
+        {
+            if (other.CompareTag("ammo"))
+            {
+
+                // ammoText.text = "Ammo: " + bulletCount;
+                bulletCount += (startingBullets);
+
+                // GameManager.ammoCollected(other);
+            }
+        }
+
+        public void push(Vector2 vector)
+        {
+            push(vector, 0);
+        }
+
+
+        //lock time is the time in seconds to lock the horizontal movement from changing
+        public void push(Vector2 vector, float lockTime)
+        {
+            impulsePush += vector;
+            if (lockTime != 0)
+                this.lockTime = lockTime;
+            
+
+        }
+        
+     
+        ////////////////////////////////////////
+        //inherited
+
+
+        public void FixedUpdate()
+        {
+            groundChecks();
+            movementUpdate();
+            directionUpdate();
+            itemProceduralAnimation();
 
         }
 
@@ -195,6 +283,7 @@ namespace Entity
         public void keyMovementVectorUpdate(Vector2 vector)
         {
             moveAxis = vector;
+            axisConstantSeconds = Time.fixedTime;
         }
 
         public void mousePositionUpdate(Vector2 mousePosition)
@@ -224,11 +313,24 @@ namespace Entity
             {
                 Debug.Log("holdingItem is null");
             }
-            
-            //  Debug.Log("left mouse release");
         }
+        
+        ///////////////////////////////////
+        //getters / setters
 
         
+        
+        public int getPlayerBullets()
+        {
+            return bulletCount;
+        }
+
+        public void setPlayerBullets(int bulletCount)
+        {
+            this.bulletCount = bulletCount;
+        }
+        
+        //////////////////////////////////////////
         //this method draws white lines under the player for debugging in the unity editor
         //the lines disappear when the game is running
         private void OnDrawGizmos()
@@ -244,40 +346,9 @@ namespace Entity
             Gizmos.DrawLine(separationLeft, endLeft);
             Gizmos.DrawLine(separationRight, endRight);
         }
-            
-        ///////////////////////////////////
-        //getters / setters
-
-        
-        
-        public int getPlayerBullets()
-        {
-            return bulletCount;
-        }
-
-        public void setPlayerBullets(int bulletCount)
-        {
-            this.bulletCount = bulletCount;
-        }
-
-        public void push(Vector2 vector)
-        {
-            impulsePush += vector;
-        }
 
 
 
-        void OnTriggerEnter2D(Collider2D other)
-        {
-            if (other.CompareTag("ammo"))
-            {
-
-               // ammoText.text = "Ammo: " + bulletCount;
-                bulletCount += (startingBullets);
-
-                // GameManager.ammoCollected(other);
-            }
-        }
     }
 
 }
