@@ -79,8 +79,8 @@ public class GameManager : MonoBehaviour
 
         if (transform.position.y < eliminationPoint)
         {
-            Debug.Log("game over");
             player.die();
+            return;
         }
 
 
@@ -97,13 +97,18 @@ public class GameManager : MonoBehaviour
 
         height = cameraLevel;
         
-        float width = mainCamera.ScreenToWorldPoint(new Vector3(mainCamera.pixelWidth, 0, 0)).x - 1;
+        float width = mainCamera.ScreenToWorldPoint(new Vector3(mainCamera.pixelWidth, 0, 0)).x;
 
         int reflect = transform.position.x > 0 ? -1 : 1;
         float boundary = Math.Abs(transform.position.x);
         if (boundary >= width)
-            player.push(new Vector2(reflect * 7,0),0.5f); //7 is arbitrary (the number that seems to work well-ish)
-        
+        {
+            if (player.isOnGround())
+                player.setHorizontalMovementRestriction(-reflect);
+            else
+                player.push(new Vector2(reflect, 0), 0.35f); //7 is arbitrary (the number that seems to work well-ish)
+        }
+        else player.setHorizontalMovementRestriction(0);
     }
     
 
@@ -201,38 +206,6 @@ public class GameManager : MonoBehaviour
         if (platform2 != null)
             activePlatforms.Add(platform2);
         
-    }
-
-    // public void ammoCollected(GameObject other)
-    // {
-    //     for (int i = 0; i >= activeAmmo.Count-1; i++)
-    //     {
-    //         if (activeAmmo[i] == other)
-    //         {
-    //             Destroy(activeAmmo[i]);
-    //         }
-    //     }
-    // }
-
-
-    public void OnDeathWallHitPlatform(GameObject platform)
-    {
-
-        // for (int i = spawnedPlatforms.Count - 1; i >= 0; i--)
-        // {
-        //     if (spawnedPlatforms[i] != null && 
-        //         spawnedPlatforms[i].transform.position.y < deathWall.transform.position.y)
-        //     {
-        //         Destroy(spawnedPlatforms[i]);
-        //         spawnedPlatforms.RemoveAt(i);
-        //
-        //         Debug.Log("Death wall hit platform!");
-        //         spawnPosition.y += Random.Range(.5f, 10f);
-        //         spawnPosition.x = Random.Range(-10f, 10f);
-        //         GameObject newPlatform = Instantiate(plat1, spawnPosition, Quaternion.identity);
-        //         spawnedPlatforms.Add(newPlatform);
-        //     }
-        // }
     }
 }
 

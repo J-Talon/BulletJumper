@@ -35,6 +35,7 @@ namespace Entity
         private Vector3 mouseWorldPosition;
         private float mouseDownTime;
 
+        private int movementRestriction;
 
         [SerializeField]
         private float impulseDamping;
@@ -83,6 +84,7 @@ namespace Entity
             axisConstantSeconds = 0;
             axisMagnitude = 0;
             lockTime = 0;
+            movementRestriction = 0;
 
             if (itemOffsetDistance <= 0)
                 itemOffsetDistance = 1;
@@ -119,13 +121,15 @@ namespace Entity
             bool zero = (moveAxis.x == 0 && moveAxis.y == 0);
             float movementDelta = 0;
 
+            //the amount of time the player has been moving in a given direction (via input)
+            // and the magnitude of their movement according to the movement function
             if (zero)
             {
                 axisConstantSeconds = Time.fixedTime;
                 axisMagnitude = 0;
             }
    
-            
+            //animator updates
             if (moveAxis.x == 0)
                 animator.SetBool("isMoving", false);
             else
@@ -136,8 +140,10 @@ namespace Entity
 
             if (onGround)
             {
+                //raw movement according to axis input and impulse force
                 Vector2 groundMovement = new Vector2(moveAxis.x * MOVE_SPEED + impulsePush.x, velocity.y + impulsePush.y);
-
+                
+                //if the player is standing still (via input)
                 if (moveAxis.x == 0)
                 {
                     if (moveAxis.y != 0)
@@ -145,32 +151,90 @@ namespace Entity
                 }
                 else
                 {
+                    //if the player is moving horizontally, then add a bit more velocity to the jumping action of the player
                     //this fixes an issue where moving and jumping makes the player jump lower
                     if (moveAxis.y != 0)
                         groundMovement.y = moveAxis.y * MOVE_SPEED * 1.5f;
                 }
+
                 
+                //movement restriction logic for the case when the player is at the boundary and is on ground
+                if (movementRestriction != 0)
+                {
+                    int directionX = groundMovement.x > 0 ? 1 : -1;
+                    if (directionX * movementRestriction > 0)
+                        groundMovement.x = 0;
+                }
+
                 rigidBody.linearVelocity = groundMovement;
             }
             else
             {
+                //logic for when player is airborne
+                
                 //gradual movement physics
                 //m = max speed
                 //s = acc
+                
+                //axisTime is the time since the player started moving via input via a certain axis
                 float axisTime = Time.fixedTime - axisConstantSeconds;
 
+                //if horizontal movement is locked, then don't worry about it
+                //otherwise use a square root function to interpolate the movement back to maximum.
+                //this fixes the jittering movement of the player when changing directions
                 if (lockTime > 0)
                     axisMagnitude = 0;
                 else
                     axisMagnitude = (float)Math.Min(axisTime, Math.Pow(MOVE_SPEED / HOR_ACCELERATION_SCALE,2));
+                
+                //update the locktime so that it runs out when it should and unlock player movement
                 lockTime = Math.Max(0,lockTime - (Time.fixedDeltaTime / Time.timeScale));
                 
+                //the magnitude of movement according to the axis magnitude
+                //based on the amount of time the player has been moving
+                /*
+                  formula:    
+                  The point at which y = max_speed is derived as:
+                  
+                  max_speed = s * sqrt(y)
+                  max_speed / s = sqrt(y)
+                  y = (max_speed / s) ^ 2
+                  So therefore axisMagnitude = min(timeElapsed, (max_speed/acceleration) ^ 2)
+                  
+                  we're basically clamping x such that it doesn't go beyond the first value where y = max_speed.
+                  this is so that when we change directions we don't wait for like 10 minutes before something
+                  actually happens. (the further beyond from where y first hits maxspeed axisMagnitude is, the less accurate the movement is)
+                 */
                 movementDelta = (float)Math.Min(HOR_ACCELERATION_SCALE * Math.Sqrt(axisMagnitude),MOVE_SPEED);
                 
+                float inAirMovementX = velocity.x + impulsePush.x;
+                float magnitude = Math.Abs(inAirMovementX);
+                float diff = MOVE_SPEED - magnitude;
+                float axisAddition = moveAxis.x * movementDelta;
                 
-                float inAirMovementX = moveAxis.x * movementDelta + velocity.x + impulsePush.x;
-                inAirMovementX = Math.Min(HOR_MAX_SPEED, inAirMovementX);
-                inAirMovementX = Math.Max(-HOR_MAX_SPEED, inAirMovementX);
+                //if the player is above max speed horizontally that's okay,
+                //but don't add axis input into it unless it opposes the velocity. Allow it to gradually go 
+                //back under threshold before adding axisAddition. And even so add it such that the max it goes to
+                //is the max speed
+                int axisDirection = (axisAddition < 0 ? -1 : 1);
+                int velocityDirection = (inAirMovementX < 0 ? -1 : 1);
+
+                if (axisDirection != velocityDirection)
+                {
+                    inAirMovementX += axisAddition;
+                }
+                else
+                {
+                    if (diff < 0)
+                        axisAddition = 0;
+                    else
+                    {
+                        axisAddition = Math.Min(Math.Abs(axisAddition), diff);
+                        axisAddition *= axisDirection;
+                    }
+                    inAirMovementX += axisAddition;
+                }
+                
                 
                 rigidBody.linearVelocity = new Vector2(inAirMovementX, velocity.y + impulsePush.y);
             }
@@ -248,6 +312,12 @@ namespace Entity
                 // GameManager.ammoCollected(other);
             }
         }
+
+        public void setHorizontalMovementRestriction(int xAxis)
+        {
+            movementRestriction = xAxis;
+        }
+
 
         public void push(Vector2 vector)
         {
@@ -329,7 +399,17 @@ namespace Entity
         {
             this.bulletCount = bulletCount;
         }
-        
+
+        public bool isOnGround()
+        {
+            return onGround;
+        }
+
+        public Vector2 getVelocity()
+        {
+            return rigidBody.linearVelocity;
+        }
+
         //////////////////////////////////////////
         //this method draws white lines under the player for debugging in the unity editor
         //the lines disappear when the game is running
