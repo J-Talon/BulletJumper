@@ -27,16 +27,17 @@ public class GameManager : MonoBehaviour
     private float minPlatformHeight;
     private float height;
 
-    //public UIDocument uiDocument;
-    //public Label scoreText;
-    //public int score;
+    public UIDocument uiDocument;
+    public Label scoreText;
+    public int score;
     
     private Vector3 spawnPosition;
     private List<GameObject> activePlatforms;
     
     void Start()
     {
-       // scoreText = uiDocument.rootVisualElement.Q<Label>("ScoreLabel");
+        scoreText = uiDocument.rootVisualElement.Q<Label>("ScoreLabel");
+
         platformPrefab = Resources.Load<GameObject>("Platform");
         spawnPosition = player.transform.position;
         if (platformPrefab == null)
@@ -81,17 +82,17 @@ public class GameManager : MonoBehaviour
         {
             player.die();
             return;
-        }
-
+        }  
+    
 
         if (cameraLevel > height)
         {
             height = cameraLevel;
-           // score = Mathf.FloorToInt(height);
-           // scoreText.text = "Score: " + score;
-            
-           // Debug.Log(ScoreManager.Instance);
-          //  ScoreManager.Instance.AddScore(score);
+            score = Mathf.FloorToInt(height);
+            scoreText.text = "Score: " + score;
+                
+            Debug.Log(ScoreManager.Instance);
+            ScoreManager.Instance.AddScore(score);
             worldUpdates();
         }
 

@@ -128,15 +128,46 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1021394672}
-  - component: {fileID: 1021394671}
+  - component: {fileID: 1021394673}
+  - component: {fileID: 1021394674}
   m_Layer: 5
   m_Name: GameUI
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
---- !u!114 &1021394671
+  m_IsActive: 1
+--- !u!4 &1021394672
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1021394670}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1021394673
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1021394670}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d2fcdf5bf96b943b6a1acb079a3c7227, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ScoreManager
+  scoreData: {fileID: 11400000, guid: c7e15f7f9fe264ff49c161029b09f3a5, type: 2}
+  ammoData: {fileID: 11400000, guid: 88fac9f57d59f4b7c9cb14517d66b18c, type: 2}
+  uiDocument: {fileID: 1021394674}
+--- !u!114 &1021394674
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -159,21 +190,6 @@ MonoBehaviour:
   m_PivotReferenceSize: 0
   m_Pivot: 0
   m_WorldSpaceCollider: {fileID: 0}
---- !u!4 &1021394672
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1021394670}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1303161994
 GameObject:
   m_ObjectHideFlags: 0
@@ -239,6 +255,8 @@ MonoBehaviour:
   platformRise: 1.5
   platformCount: 20
   ammoAmount: 5
+  uiDocument: {fileID: 1021394674}
+  score: 0
 --- !u!4 &1395575164
 Transform:
   m_ObjectHideFlags: 0
@@ -379,7 +397,7 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: -0.012571335, y: 0}
+  m_Offset: {x: -0.0012001991, y: 0.018816113}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
@@ -389,7 +407,7 @@ BoxCollider2D:
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 20.039024, y: 1}
+  m_Size: {x: 20.016281, y: 0.4725206}
   m_EdgeRadius: 0
 --- !u!20 &564854966261897934
 Camera:
@@ -476,7 +494,7 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0, y: 0}
+  m_Offset: {x: 0.0016495436, y: -0.04123819}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
@@ -486,7 +504,7 @@ BoxCollider2D:
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 1, y: 1}
+  m_Size: {x: 0.5282353, y: 0.7855613}
   m_EdgeRadius: 0
 --- !u!50 &1160087814750235300
 Rigidbody2D:
@@ -819,6 +837,7 @@ MonoBehaviour:
   castSeparation: 0.49
   verticalCastOffset: -0.54
   castDistance: 0.07
+  uiDocument: {fileID: 1021394674}
 --- !u!4 &8752385194608801775
 Transform:
   m_ObjectHideFlags: 0
