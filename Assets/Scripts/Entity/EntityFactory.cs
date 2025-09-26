@@ -8,6 +8,16 @@ namespace Entity
     {
 
         private static GameObject PROJECTILE_PREFAB = Resources.Load<GameObject>("bullet");
+        private static GameManager gameManager;
+
+        public static void setActiveManager(GameManager newManager)
+        {
+            gameManager = newManager;
+        }
+        
+        //the idea here is that you will be able to add entities to the game manager to track.
+        //by gameManager.trackEntity(entity) or something similar
+
         public static Projectile createProjectile(Vector2 transform, string ownerId, Vector2 direction, float speed)
         {
             if (PROJECTILE_PREFAB == null)
@@ -21,8 +31,7 @@ namespace Entity
             float angleDegrees = 180f * angleRads / Mathf.PI;
             Quaternion rotation = Quaternion.Euler(0, 0, angleDegrees - 90);  //90 degrees because the model
                                                                               //is vertical in the spritesheet
-            
-
+                                                                              
             GameObject bullet = GameObject.Instantiate(PROJECTILE_PREFAB,new Vector3(transform.x, transform.y, 0), rotation);
             Projectile projectile = bullet.GetComponent<Projectile>();
             projectile.initialize(ownerId,direction,speed);

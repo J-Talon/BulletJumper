@@ -61,7 +61,7 @@ namespace Item
             Vector2 scale = direction * hypotenuse;
             Vector2 spawnPosition = new Vector2(form.position.x + scale.x, form.position.y + scale.y);
 
-            if (power < 1)
+            if (power <= 1)
             {
                 if (!canFire(fixedTime, bullets))
                 {
@@ -112,6 +112,7 @@ namespace Item
                 EntityFactory.createProjectile(spawnPosition, player.getID(), rightBulletDir, SPEED);
 
                 Vector2 recoil = direction * (-10 * (power));
+                Debug.Log(power +" "+"fire 3");
                 player.push(recoil);
                 
                 SoundManager.instance.playSound("shot");
