@@ -213,7 +213,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &922746602
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -265,6 +265,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ScoreManager
   scoreData: {fileID: 11400000, guid: c7e15f7f9fe264ff49c161029b09f3a5, type: 2}
+  ammoData: {fileID: 11400000, guid: 88fac9f57d59f4b7c9cb14517d66b18c, type: 2}
   uiDocument: {fileID: 922746602}
 --- !u!1 &1293035067
 GameObject:
