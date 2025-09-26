@@ -165,6 +165,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ScoreManager
   scoreData: {fileID: 11400000, guid: c7e15f7f9fe264ff49c161029b09f3a5, type: 2}
+  ammoData: {fileID: 11400000, guid: 88fac9f57d59f4b7c9cb14517d66b18c, type: 2}
   uiDocument: {fileID: 1021394674}
 --- !u!114 &1021394674
 MonoBehaviour:
@@ -396,7 +397,7 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: -0.012571335, y: 0}
+  m_Offset: {x: -0.0012001991, y: 0.018816113}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
@@ -406,7 +407,7 @@ BoxCollider2D:
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 20.039024, y: 1}
+  m_Size: {x: 20.016281, y: 0.4725206}
   m_EdgeRadius: 0
 --- !u!20 &564854966261897934
 Camera:
@@ -493,7 +494,7 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0, y: 0}
+  m_Offset: {x: 0.0016495436, y: -0.04123819}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
@@ -503,7 +504,7 @@ BoxCollider2D:
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 1, y: 1}
+  m_Size: {x: 0.5282353, y: 0.7855613}
   m_EdgeRadius: 0
 --- !u!50 &1160087814750235300
 Rigidbody2D:
