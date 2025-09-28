@@ -15,7 +15,7 @@ namespace Entity.Projectiles
         
         public override void die()
         {
-            //maybe create a hit animation here
+            GameManager.instance.removeEntity(getID());
             Destroy(gameObject);
         }
 
@@ -24,7 +24,6 @@ namespace Entity.Projectiles
             this.ownerID = ownerId;
             this.direction = direction;
             this.moveSpeed = moveSpeed;
-            base.initID();
         }
 
         public void Awake()

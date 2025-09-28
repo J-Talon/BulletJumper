@@ -112,7 +112,7 @@ namespace Item
                 EntityFactory.createProjectile(spawnPosition, player.getID(), rightBulletDir, SPEED);
 
                 Vector2 recoil = direction * (-10 * (power));
-                Debug.Log(power +" "+"fire 3");
+                //Debug.Log(power +" "+"fire 3");
                 player.push(recoil);
                 
                 SoundManager.instance.playSound("shot");

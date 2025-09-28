@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 5597941326741320846}
   - component: {fileID: 5421818260118020505}
   - component: {fileID: 6654696359900214763}
-  - component: {fileID: 4213941639217271223}
+  - component: {fileID: 9158954056846658853}
   m_Layer: 0
   m_Name: Ammo
   m_TagString: ammo
@@ -138,7 +138,7 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 0.40625, y: 0.9375}
   m_EdgeRadius: 0
---- !u!114 &4213941639217271223
+--- !u!114 &9158954056846658853
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -147,6 +147,6 @@ MonoBehaviour:
   m_GameObject: {fileID: 310287116531691450}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ad2bd859920ba4f45bca48a50d5fdbcc, type: 3}
+  m_Script: {fileID: 11500000, guid: c3def477b43a4191917c27a6c5efd324, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: '::'
+  m_EditorClassIdentifier: Assembly-CSharp::Entity.GamePickup.PickupAmmo

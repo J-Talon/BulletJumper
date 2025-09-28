@@ -8,18 +8,23 @@ namespace Entity
     {
 
         protected string guid;
-        
-
-        protected void initID()
-        {
-            guid = System.Guid.NewGuid().ToString();
-        }
+        protected float minimumLoadedY;
         
         public abstract void die();
 
+        //lazy initialization
         public string getID()
         {
+            if (guid == null)
+                guid = System.Guid.NewGuid().ToString();
             return guid;
         }
+
+        public void updateBoundary(float eliminationY)
+        {
+            this.minimumLoadedY = eliminationY;
+        }
+
+
     }
 }

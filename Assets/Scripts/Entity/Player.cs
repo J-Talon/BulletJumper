@@ -64,8 +64,6 @@ namespace Entity
         {
 
             ammoText = uiDocument.rootVisualElement.Q<Label>("AmmoCount");
-            
-            base.initID();
             ((InputListener)this).subscribe();
             rigidBody = GetComponent<Rigidbody2D>();
             animator = GetComponent<Animator>();
@@ -303,18 +301,18 @@ namespace Entity
         }
 
         
-        
-        void OnTriggerEnter2D(Collider2D other)
-        {
-            if (other.CompareTag("ammo"))
-            {
-
-                // ammoText.text = "Ammo: " + bulletCount;
-                bulletCount += (startingBullets);
-
-                // GameManager.ammoCollected(other);
-            }
-        }
+        //
+        // void OnTriggerEnter2D(Collider2D other)
+        // {
+        //     if (other.CompareTag("ammo"))
+        //     {
+        //
+        //         // ammoText.text = "Ammo: " + bulletCount;
+        //         bulletCount += (startingBullets);
+        //
+        //         // GameManager.ammoCollected(other);
+        //     }
+        // }
 
         public void setHorizontalMovementRestriction(int xAxis)
         {
@@ -404,6 +402,16 @@ namespace Entity
             this.bulletCount = bulletCount;
             ScoreManager.Instance.AddAmmo(bulletCount);
             ammoText.text = "Ammo: " + bulletCount;
+        }
+
+        public void addBullets(int bullets)
+        {
+            this.bulletCount += bullets;
+        }
+
+        public void removeBullets(int bullets)
+        {
+            this.bulletCount = Math.Max(0, bulletCount - bullets);
         }
 
         public bool isOnGround()

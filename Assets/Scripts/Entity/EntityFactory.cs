@@ -1,4 +1,5 @@
 ﻿using System;
+using Entity.GamePickup;
 using Entity.Projectiles;
 using UnityEngine;
 
@@ -8,6 +9,7 @@ namespace Entity
     {
 
         private static GameObject PROJECTILE_PREFAB = Resources.Load<GameObject>("bullet");
+        private static GameObject AMMO_PICKUP_PREFAB = Resources.Load<GameObject>("Ammo");
         private static GameManager gameManager;
 
         public static void setActiveManager(GameManager newManager)
@@ -34,8 +36,39 @@ namespace Entity
                                                                               
             GameObject bullet = GameObject.Instantiate(PROJECTILE_PREFAB,new Vector3(transform.x, transform.y, 0), rotation);
             Projectile projectile = bullet.GetComponent<Projectile>();
+            
+            GameManager manager = GameManager.instance;
+            if (manager == null)
+            {
+                Debug.Log("manager nul");
+            }
+            
+            manager.addEntity(projectile);
             projectile.initialize(ownerId,direction,speed);
             return projectile;
+        }
+
+
+        public static Pickup createPickup(Vector2 transform)
+        {
+            if (AMMO_PICKUP_PREFAB == null)
+            {
+                Debug.Log("AMMO_PICKUP_PREFAB Not Found");
+                return null;
+            }
+            
+            
+            GameObject ammo = GameObject.Instantiate(AMMO_PICKUP_PREFAB,new Vector3(transform.x, transform.y, 0), Quaternion.identity);
+            Pickup pickup = ammo.GetComponent<Pickup>();
+            GameManager manager = GameManager.instance;
+
+            if (manager == null)
+            {
+                Debug.Log("manager nul");
+            }
+
+            manager.addEntity(pickup);
+            return pickup;
         }
     }
 }

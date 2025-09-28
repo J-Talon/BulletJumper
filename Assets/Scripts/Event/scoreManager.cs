@@ -55,7 +55,7 @@ public class ScoreManager : MonoBehaviour
         if (scoreData != null)
         {
             scoreData.AddScore(points);
-            Debug.Log($"Score added: {points}. Current score: {scoreData.CurrentScore}");
+         //   Debug.Log($"Score added: {points}. Current score: {scoreData.CurrentScore}");
         }
     }
 
@@ -64,7 +64,7 @@ public class ScoreManager : MonoBehaviour
         if (scoreData != null)
         {
             scoreData.ResetScore();
-            Debug.Log("Score reset to 0");
+           // Debug.Log("Score reset to 0");
         }
     }
 
@@ -92,7 +92,7 @@ public class ScoreManager : MonoBehaviour
         if (ammoData != null)
         {
             ammoData.ResetAmmo();
-            Debug.Log("Ammo reset to 0");
+          //  Debug.Log("Ammo reset to 0");
         }
     }
 
