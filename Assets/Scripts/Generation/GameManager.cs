@@ -17,7 +17,8 @@ public class GameManager : MonoBehaviour
     
     [SerializeField] public int platformCount = 40;
 
-    [SerializeField] public int ammoAmount = 5;
+    [SerializeField] public float baseVerticalScrollRate = 0.25f;
+    
     
     private float eliminationPoint;
     
@@ -71,8 +72,23 @@ public class GameManager : MonoBehaviour
         Transform transform = player.gameObject.transform;
         float cameraLevel =  Math.Max(transform.position.y, height); //height is the camera height
         
-        mainCamera.transform.position = new Vector3(spawnPosition.x, cameraLevel, mainCamera.transform.position.z);
+        if (cameraLevel > height)
+        {
+            height = cameraLevel;
+            score = Mathf.FloorToInt(height);
+            scoreText.text = "Score: " + score;
+            
+            ScoreManager.Instance.AddScore(score);
+            worldUpdates();
+        }
+        else
+        {
+            float ascension = (Time.fixedDeltaTime / Time.timeScale) * baseVerticalScrollRate;
+            cameraLevel += ascension;
+        }
         
+        mainCamera.transform.position = new Vector3(spawnPosition.x, cameraLevel, mainCamera.transform.position.z);
+
 
         float cameraMin = mainCamera.ScreenToWorldPoint(new Vector3(0, mainCamera.pixelHeight, 0)).y;
         float diff = cameraMin - mainCamera.transform.position.y;
@@ -84,17 +100,7 @@ public class GameManager : MonoBehaviour
             player.die();
             return;
         }  
-    
 
-        if (cameraLevel > height)
-        {
-            height = cameraLevel;
-            score = Mathf.FloorToInt(height);
-            scoreText.text = "Score: " + score;
-            
-            ScoreManager.Instance.AddScore(score);
-            worldUpdates();
-        }
 
         height = cameraLevel;
         
