@@ -1,6 +1,6 @@
 ﻿
-
 using System;
+using Entity.Enemy;
 using UnityEngine;
 
 namespace Entity.Projectiles
@@ -15,7 +15,7 @@ namespace Entity.Projectiles
         
         public override void die()
         {
-            //maybe create a hit animation here
+            GameManager.instance.removeEntity(getID());
             Destroy(gameObject);
         }
 
@@ -24,7 +24,6 @@ namespace Entity.Projectiles
             this.ownerID = ownerId;
             this.direction = direction;
             this.moveSpeed = moveSpeed;
-            base.initID();
         }
 
         public void Awake()
@@ -38,14 +37,44 @@ namespace Entity.Projectiles
             rigidBody.linearVelocity = vector;
         }
 
-        public void onCollideEntity(GameObject entity)
+        public void onCollideEntity(GameEntity gameEntity)
         {
             
+            
+            if (!(gameEntity is LivingEntity))
+                return;
+    
+            LivingEntity living = gameEntity as LivingEntity;
+            string ownerId = living.getID();
+            
+            if (ownerId.Equals(ownerID))
+                return;
+            
+            GameEntity hit = GameManager.instance.getEntity(ownerId);
+            GameEntity owner = GameManager.instance.getEntity(ownerID);
+
+            if ((hit is GameEnemy) && (owner is GameEnemy))
+                return;
+
+            living.damage();
+            die();
         }
+
 
         public void onCollideTerrain(GameObject terrain)
         {
-            
+         //
         }
+
+
+        public void OnTriggerEnter2D(Collider2D other)
+        {
+            GameEntity gameEntity = other.gameObject.GetComponent<GameEntity>();
+            if (gameEntity == null)
+                onCollideTerrain(other.gameObject);
+            else 
+                onCollideEntity(gameEntity);
+        }
+
     }
 }

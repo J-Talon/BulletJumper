@@ -70,7 +70,7 @@ namespace Item
                 }
 
                 lastFireTime = (int)fixedTime * 1000;
-                EntityFactory.createProjectile(spawnPosition, player.getID(), direction, SPEED);
+                EntityFactory.createBullet(spawnPosition, player.getID(), direction, SPEED);
 
                 Vector2 recoil = direction * -10;
                 player.push(recoil);
@@ -107,12 +107,12 @@ namespace Item
                 leftBulletDir.x *= facingDirection;
                 rightBulletDir.x *= facingDirection;
                 
-                EntityFactory.createProjectile(spawnPosition, player.getID(), direction, SPEED);
-                EntityFactory.createProjectile(spawnPosition, player.getID(), leftBulletDir, SPEED);
-                EntityFactory.createProjectile(spawnPosition, player.getID(), rightBulletDir, SPEED);
+                EntityFactory.createBullet(spawnPosition, player.getID(), direction, SPEED);
+                EntityFactory.createBullet(spawnPosition, player.getID(), leftBulletDir, SPEED);
+                EntityFactory.createBullet(spawnPosition, player.getID(), rightBulletDir, SPEED);
 
                 Vector2 recoil = direction * (-10 * (power));
-                Debug.Log(power +" "+"fire 3");
+                //Debug.Log(power +" "+"fire 3");
                 player.push(recoil);
                 
                 SoundManager.instance.playSound("shot");
