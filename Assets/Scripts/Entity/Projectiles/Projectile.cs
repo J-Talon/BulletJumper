@@ -1,6 +1,6 @@
 ﻿
-
 using System;
+using Entity.Enemy;
 using UnityEngine;
 
 namespace Entity.Projectiles
@@ -37,14 +37,49 @@ namespace Entity.Projectiles
             rigidBody.linearVelocity = vector;
         }
 
-        public void onCollideEntity(GameObject entity)
+        public void onCollideEntity(GameEntity gameEntity)
         {
             
+            
+            if (!(gameEntity is LivingEntity))
+                return;
+            Debug.Log(1);
+            LivingEntity living = gameEntity as LivingEntity;
+            string ownerId = living.getID();
+            
+            if (ownerId.Equals(ownerID))
+                return;
+            Debug.Log(2);
+
+            GameEntity hit = GameManager.instance.getEntity(ownerId);
+            GameEntity owner = GameManager.instance.getEntity(ownerID);
+
+            if ((hit is GameEnemy) && (owner is GameEnemy))
+                return;
+            
+            Debug.Log(hit == null);
+            
+            Debug.Log((hit is GameEnemy )+" "+ (owner is GameEnemy));
+
+            living.damage();
+            die();
         }
+
 
         public void onCollideTerrain(GameObject terrain)
         {
-            
+         //
         }
+
+
+        public void OnTriggerEnter2D(Collider2D other)
+        {
+            GameEntity gameEntity = other.gameObject.GetComponent<GameEntity>();
+            if (gameEntity == null)
+                onCollideTerrain(other.gameObject);
+            else 
+                onCollideEntity(gameEntity);
+        }
+
     }
 }

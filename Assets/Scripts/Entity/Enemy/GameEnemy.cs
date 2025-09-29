@@ -1,28 +1,15 @@
-﻿using System;
-
+﻿
 namespace Entity.Enemy
 {
-    public class GameEnemy:LivingEntity
+    public abstract class GameEnemy:LivingEntity
     {
-        private void Awake()
-        {
-            
-        }
+        
+        
 
-        public void FixedUpdate()
-        {
-            
-        }
+        public abstract void attack();
 
-        public override void die()
-        {
-            GameManager.instance.removeEntity(getID());
-            Destroy(gameObject);
-        }
 
-        public override bool damage()
-        {
-            return true;
-        }
+
+
     }
 }

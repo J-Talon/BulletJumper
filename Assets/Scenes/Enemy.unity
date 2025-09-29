@@ -175,7 +175,7 @@ GameObject:
   - component: {fileID: 2096361390}
   m_Layer: 0
   m_Name: Ground
-  m_TagString: Untagged
+  m_TagString: Terrain
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -515,6 +515,14 @@ PrefabInstance:
       propertyPath: uiDocument
       value: 
       objectReference: {fileID: 1021394674}
+    - target: {fileID: 5473350280558009203, guid: f60d9379acf76f046a352149b06ef76a, type: 3}
+      propertyPath: platformCount
+      value: 40
+      objectReference: {fileID: 0}
+    - target: {fileID: 5473350280558009203, guid: f60d9379acf76f046a352149b06ef76a, type: 3}
+      propertyPath: baseVerticalScrollRate
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8732297853076480376, guid: f60d9379acf76f046a352149b06ef76a, type: 3}
       propertyPath: m_Name
       value: GameManager
@@ -605,11 +613,11 @@ PrefabInstance:
       objectReference: {fileID: 1021394674}
     - target: {fileID: 5745048939791413539, guid: 75efeabbc27937a40bd626be12cc6e15, type: 3}
       propertyPath: castSeparation
-      value: 0.54
+      value: 0.38
       objectReference: {fileID: 0}
     - target: {fileID: 5745048939791413539, guid: 75efeabbc27937a40bd626be12cc6e15, type: 3}
       propertyPath: verticalCastOffset
-      value: -0.87
+      value: -0.68
       objectReference: {fileID: 0}
     - target: {fileID: 6568637461498303504, guid: 75efeabbc27937a40bd626be12cc6e15, type: 3}
       propertyPath: m_Name

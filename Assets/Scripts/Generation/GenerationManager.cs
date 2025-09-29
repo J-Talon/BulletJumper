@@ -48,13 +48,26 @@ namespace Generation
         {
             
             int amountGenerated = 0;
+            int riseAttempts = 0;
+            int MAX_ATTEMPTS = 3;
+            
             while (amountGenerated < amountToGenerate)
             {
                 if (activePlatforms.Count >= maxPlatforms)
                     break;
-                
-                minPlatformHeight += platformRiseAmount;
-                
+
+                bool riseRoll = Random.value > 0.3f;
+                if (riseRoll)
+                {
+                    riseAttempts++;
+                }
+
+                if (riseAttempts >= MAX_ATTEMPTS || !riseRoll)
+                {
+                    minPlatformHeight += platformRiseAmount;
+                    riseAttempts = 0;
+                }
+
                 float coordinateX = (Random.Range(-frustumWidth, frustumWidth) + spawnReferencePoint.x);
                 float direction = Random.value;
                 int offset = direction > 0.5f ? 1 : -1;
@@ -82,6 +95,19 @@ namespace Generation
                     
                 }
             }
+            
+            bool generateEnemies = Random.value > 0.5f;
+            if (!generateEnemies)
+                return;
+            
+            
+            float xIn = frustumWidth + 1;
+            xIn = Random.value > 0.5f ? -(xIn) : xIn;
+            float yIn = minPlatformHeight;
+
+            EntityFactory.createSeagull(new Vector2(xIn, yIn));
+
+
         }
         
         

@@ -15,7 +15,7 @@ public class GameManager : MonoBehaviour
 
     [SerializeField] public float platformRise;
     
-    [SerializeField] public int platformCount = 40;
+    [SerializeField] public int platformCount = 50;
 
     [SerializeField] public float baseVerticalScrollRate = 0.25f;
     
@@ -35,6 +35,7 @@ public class GameManager : MonoBehaviour
     public static GameManager instance = null;
 
     private GenerationManager worldManager;
+    private float frustumWidth;
 
     private void Awake()
     {
@@ -46,6 +47,8 @@ public class GameManager : MonoBehaviour
         //Edit > project settings > script execution order.
         instance = this;
         entities = new ConcurrentDictionary<string, GameEntity>();
+        EntityFactory.setActiveManager(this);
+     
     }
 
     void Start()
@@ -62,8 +65,9 @@ public class GameManager : MonoBehaviour
         minPlatformHeight = player.transform.position.y;
         worldManager = new GenerationManager(platformCount, platformRise,player.transform.position);
         
-        float width = mainCamera.ScreenToWorldPoint(new Vector3(mainCamera.pixelWidth, 0, 0)).x;
-        worldManager.generateWorld(width,platformCount);
+        frustumWidth = mainCamera.ScreenToWorldPoint(new Vector3(mainCamera.pixelWidth, 0, 0)).x;
+        worldManager.generateWorld(frustumWidth,platformCount);
+
     }
 
     
@@ -100,15 +104,14 @@ public class GameManager : MonoBehaviour
             player.die();
             return;
         }  
-
-
+        
         height = cameraLevel;
         
-        float width = mainCamera.ScreenToWorldPoint(new Vector3(mainCamera.pixelWidth, 0, 0)).x;
+        
 
         int reflect = transform.position.x > 0 ? -1 : 1;
         float boundary = Math.Abs(transform.position.x);
-        if (boundary >= width)
+        if (boundary >= frustumWidth)
         {
             if (player.isOnGround())
                 player.setHorizontalMovementRestriction(-reflect);
@@ -121,11 +124,20 @@ public class GameManager : MonoBehaviour
 
     private void worldUpdates()
     {
-        float width = mainCamera.ScreenToWorldPoint(new Vector3(mainCamera.pixelWidth, 0, 0)).x - 1;
+        float width = frustumWidth - 1;
         worldManager.ascend(minPlatformHeight, width, eliminationPoint);
+        updateBoundaries();
     }
-    
-    
+
+    private void updateBoundaries()
+    {
+        foreach (KeyValuePair<string, GameEntity> pair in entities) {
+            GameEntity entity = pair.Value;
+          //  entity.updateBoundaryY(eliminationPoint);
+        }
+    }
+
+
     public void removeEntity(string uuid)
     {
         if (entities.ContainsKey(uuid))
@@ -134,16 +146,32 @@ public class GameManager : MonoBehaviour
 
     public void addEntity(GameEntity entity)
     {
-        entities.TryAdd(entity.getID(), entity);
+        bool res = entities.TryAdd(entity.getID(), entity);
     }
 
     public GameEntity getEntity(string uuid)
     {
         GameEntity entity = null;
-        bool result = entities.TryGetValue(uuid, out entity);
-        if (!result || entity == null)
-            return null;
+       entities.TryGetValue(uuid, out entity);
         return entity;
+    }
+
+    public float getFrustumWidth()
+    {
+        return frustumWidth;
+    }
+
+    //returns camera transform y and 1/2 the width of the frustum
+    public Vector2 getCameraParams()
+    {
+        float cameraMin = mainCamera.ScreenToWorldPoint(new Vector3(0, mainCamera.pixelHeight, 0)).y;
+        float diff = cameraMin - mainCamera.transform.position.y;
+        return new Vector2(mainCamera.transform.position.y, diff);
+    }
+
+    public float getSpawnX()
+    {
+        return spawnPosition.x;
     }
 }
 

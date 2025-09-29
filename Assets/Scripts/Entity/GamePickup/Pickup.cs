@@ -6,6 +6,7 @@ namespace Entity.GamePickup
     public abstract class Pickup : GameEntity
     {
 
+        //destruction is handled by the game manager
         public abstract void onPickup(Player player);
 
         private void OnTriggerEnter2D(Collider2D other)

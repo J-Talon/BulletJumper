@@ -8,7 +8,7 @@ namespace Entity
     {
 
         protected string guid;
-        protected float minimumLoadedY;
+        protected float loadedX = 0;
         
         public abstract void die();
 
@@ -19,10 +19,17 @@ namespace Entity
                 guid = System.Guid.NewGuid().ToString();
             return guid;
         }
+        
 
-        public void updateBoundary(float eliminationY)
+        public void updateBoundaryX(float eliminationX)
         {
-            this.minimumLoadedY = eliminationY;
+            this.loadedX = eliminationX;
+        }
+        
+
+        public float getWidthX()
+        {
+            return loadedX;
         }
 
 
