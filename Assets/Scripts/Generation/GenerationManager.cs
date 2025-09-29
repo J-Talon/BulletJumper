@@ -16,6 +16,10 @@ namespace Generation
         private float minPlatformHeight;
         private Vector2 spawnReferencePoint;
 
+        private float enemyChance;
+        private const float ENEMY_CHANCE_ACC = 0.03f;
+        private const float SPAWN_REDUCT = 0.3f;
+
         public GenerationManager(int maxPlatforms, float platformRiseAmount, Vector2 spawnReferencePoint)
         {
             platformPrefab = Resources.Load<GameObject>("Platform");
@@ -31,6 +35,7 @@ namespace Generation
             this.maxPlatforms = maxPlatforms;
             this.platformRiseAmount = platformRiseAmount;
             this.spawnReferencePoint = spawnReferencePoint;
+            enemyChance = 0;
         }
 
 
@@ -56,7 +61,7 @@ namespace Generation
                 if (activePlatforms.Count >= maxPlatforms)
                     break;
 
-                bool riseRoll = Random.value > 0.3f;
+                bool riseRoll = Random.value > 0.6f;
                 if (riseRoll)
                 {
                     riseAttempts++;
@@ -95,12 +100,15 @@ namespace Generation
                     
                 }
             }
-            
-            bool generateEnemies = Random.value > 0.5f;
-            if (!generateEnemies)
+
+            bool skipGeneration = Random.value > enemyChance;
+            if (skipGeneration)
+            {
+                enemyChance += ENEMY_CHANCE_ACC + (0.3f * Mathf.Sin(minPlatformHeight));
                 return;
-            
-            
+            }
+
+            enemyChance = Mathf.Max(0, enemyChance - SPAWN_REDUCT);
             float xIn = frustumWidth + 1;
             xIn = Random.value > 0.5f ? -(xIn) : xIn;
             float yIn = minPlatformHeight;

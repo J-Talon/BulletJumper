@@ -131,9 +131,24 @@ public class GameManager : MonoBehaviour
 
     private void updateBoundaries()
     {
+        float minX = spawnPosition.x - frustumWidth;
+        float maxX = spawnPosition.x + frustumWidth;
+        
         foreach (KeyValuePair<string, GameEntity> pair in entities) {
             GameEntity entity = pair.Value;
-          //  entity.updateBoundaryY(eliminationPoint);
+            if (entity.transform.position.y < eliminationPoint)
+            {
+                entity.die();
+                continue;
+            }
+
+            float x = entity.transform.position.x;
+            if (x > maxX || x < minX)
+            {
+                entity.die();
+            }
+
+
         }
     }
 
@@ -146,7 +161,7 @@ public class GameManager : MonoBehaviour
 
     public void addEntity(GameEntity entity)
     {
-        bool res = entities.TryAdd(entity.getID(), entity);
+        entities.TryAdd(entity.getID(), entity);
     }
 
     public GameEntity getEntity(string uuid)

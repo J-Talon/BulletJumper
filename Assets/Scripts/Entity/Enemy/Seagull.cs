@@ -19,6 +19,8 @@ namespace Entity.Enemy
         private float periodTime;
         private float attackTime;
         private Animator animator;
+
+        private float offsetY;
         
         public void Start()
         {
@@ -27,6 +29,10 @@ namespace Entity.Enemy
             animator = GetComponent<Animator>();
             periodTime = 0;
             attackTime = 0;
+
+            offsetY = 0;
+            
+            GameManager.instance.addEntity(this);
         }
 
         public void FixedUpdate()
@@ -37,6 +43,8 @@ namespace Entity.Enemy
             
             if (periodTime > PATROL_TIME)
                 newTargetPosition();
+            
+            patrolPosition.y = GameManager.instance.getCameraParams().x - offsetY;
             moveToLocation(patrolPosition);
 
             if (attackTime >= ATTACK_COOLDOWN)
@@ -53,7 +61,7 @@ namespace Entity.Enemy
             Vector2 location = transform.position;
             Vector2 diff = targetPos - location;
             
-            if (diff.magnitude < 0.1f)
+            if (diff.SqrMagnitude() < 0.1f)
             {
                 rigidBody.linearVelocity = Vector2.zero;
                 return;
@@ -75,6 +83,7 @@ namespace Entity.Enemy
             Vector2 camera = manager.getCameraParams();
 
             float nextY = targetPosition.y + (Random.value * camera.y);
+            offsetY = camera.x - nextY;
 
             float nextX = (Random.value * boundsX  * 2) - (boundsX + 1);
             
@@ -107,14 +116,6 @@ namespace Entity.Enemy
         {
             die();
             return true;
-        }
-
-        public void OnCollisionEnter2D(Collision2D other)
-        {
-            bool compare = other.collider.CompareTag(gameObject.tag);
-            if (!compare)
-                Physics2D.IgnoreCollision(other.collider, GetComponent<Collider2D>());
-            
         }
     }
 }

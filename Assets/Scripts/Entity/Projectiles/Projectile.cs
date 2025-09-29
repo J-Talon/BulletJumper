@@ -43,23 +43,18 @@ namespace Entity.Projectiles
             
             if (!(gameEntity is LivingEntity))
                 return;
-            Debug.Log(1);
+    
             LivingEntity living = gameEntity as LivingEntity;
             string ownerId = living.getID();
             
             if (ownerId.Equals(ownerID))
                 return;
-            Debug.Log(2);
-
+            
             GameEntity hit = GameManager.instance.getEntity(ownerId);
             GameEntity owner = GameManager.instance.getEntity(ownerID);
 
             if ((hit is GameEnemy) && (owner is GameEnemy))
                 return;
-            
-            Debug.Log(hit == null);
-            
-            Debug.Log((hit is GameEnemy )+" "+ (owner is GameEnemy));
 
             living.damage();
             die();
