@@ -5,16 +5,19 @@ public class ScoreManager : MonoBehaviour
 {
     [SerializeField] private ScoreData scoreData;
     [SerializeField] private AmmoData ammoData;
+   // [SerializeField] private HighscoreData highscoreData;
     
     public static ScoreManager Instance { get; private set; }
     
     public ScoreData ScoreData => scoreData;
     public AmmoData AmmoData => ammoData;
+   // public HighScoreData HighscoreData => highscoreData;
 
     public UIDocument uiDocument;
 
     public Label scoreText;
     public Label ammoText;
+    public Label highscoreText;
 
     private void Awake()
     {
@@ -43,6 +46,15 @@ public class ScoreManager : MonoBehaviour
                     Debug.LogError("AmmoData ScriptableObject not found! Please create one in the Resources folder.");
                 }
             }
+
+            //     if (highscoreData == null)
+            // {
+            //     highscoreData = Resources.Load<HighscoreData>("HighscoreData");
+            //     if (highscoreData == null)
+            //     {
+            //         Debug.LogError("HighscoreData ScriptableObject not found! Please create one in the Resources folder.");
+            //     }
+            // }
         }
         else
         {
@@ -92,7 +104,7 @@ public class ScoreManager : MonoBehaviour
         if (ammoData != null)
         {
             ammoData.ResetAmmo();
-            Debug.Log("Ammo reset to 0");
+            Debug.Log("Ammo reset to 5");
         }
     }
 
@@ -105,11 +117,14 @@ public class ScoreManager : MonoBehaviour
     {
         scoreText = uiDocument.rootVisualElement.Q<Label>("ScoreLabel");
         ammoText = uiDocument.rootVisualElement.Q<Label>("AmmoCount");
+        highscoreText = uiDocument.rootVisualElement.Q<Label>("Highscore");
+
     }
     void Update()
     {
         scoreText.text = "Score: " + GetCurrentScore();
         ammoText.text = "Ammo: " + GetCurrentAmmo();
+        highscoreText.text = "Highscore: " + GetHighScore();
 
     }
 }
