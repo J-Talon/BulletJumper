@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UIElements;
+using UnityEngine.SceneManagement;
 
 public class ScoreManager : MonoBehaviour
 {
@@ -118,6 +119,13 @@ public class ScoreManager : MonoBehaviour
         scoreText = uiDocument.rootVisualElement.Q<Label>("ScoreLabel");
         ammoText = uiDocument.rootVisualElement.Q<Label>("AmmoCount");
         highscoreText = uiDocument.rootVisualElement.Q<Label>("Highscore");
+
+        if (SceneManager.GetActiveScene() == SceneManager.GetSceneByName("UI_prototype"))
+        {
+            ResetScore();
+            ResetAmmo();
+        }
+
 
     }
     void Update()
