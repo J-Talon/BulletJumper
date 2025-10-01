@@ -29,7 +29,7 @@ public class AmmoData : ScriptableObject
 
     public void ResetAmmo()
     {
-        currentAmmo = 0;
+        currentAmmo = 5;
     }
 
     public void ResetAll()
