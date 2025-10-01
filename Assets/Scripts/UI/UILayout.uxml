@@ -1,4 +1,5 @@
 <ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
-    <ui:Label name="ScoreLabel" />
-    <ui:Label name="AmmoCount" />
+    <ui:Label name="ScoreLabel" data-source="project://database/Assets/Scripts/Data/ScoreData.asset?fileID=11400000&amp;guid=c7e15f7f9fe264ff49c161029b09f3a5&amp;type=2#ScoreData" />
+    <ui:Label name="AmmoCount" data-source="project://database/Assets/Scripts/Data/AmmoData.asset?fileID=11400000&amp;guid=88fac9f57d59f4b7c9cb14517d66b18c&amp;type=2#AmmoData" />
+    <ui:Label name="Highscore" data-source="project://database/Assets/Scripts/Data/ScoreData.asset?fileID=11400000&amp;guid=c7e15f7f9fe264ff49c161029b09f3a5&amp;type=2#ScoreData" />
 </ui:UXML>
