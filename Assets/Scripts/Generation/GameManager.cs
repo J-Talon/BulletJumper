@@ -1,29 +1,29 @@
 using System;
+using System.Collections.Concurrent;
 using UnityEngine;
 using System.Collections.Generic;
 using Entity;
-using Random = UnityEngine.Random;
+using Generation;
 using UnityEngine.UIElements;
 
 public class GameManager : MonoBehaviour
 {
-    private GameObject platformPrefab;
+    
     private Camera mainCamera;
     
     [SerializeField] public Player player;
 
     [SerializeField] public float platformRise;
     
-    [SerializeField] public int platformCount = 40;
+    [SerializeField] public int platformCount = 50;
 
-    [SerializeField] public int ammoAmount = 5;
+    [SerializeField] public float baseVerticalScrollRate = 0.25f;
+    
     
     private float eliminationPoint;
     
-    private GameObject ammoPrefab;
-    private List<GameObject> activeAmmo;
-
-
+    private Vector3 spawnPosition;
+    
     private float minPlatformHeight;
     private float height;
 
@@ -31,37 +31,43 @@ public class GameManager : MonoBehaviour
     public Label scoreText;
     public int score;
     
-    private Vector3 spawnPosition;
-    private List<GameObject> activePlatforms;
-    
+    private ConcurrentDictionary<string, GameEntity> entities;
+    public static GameManager instance = null;
+
+    private GenerationManager worldManager;
+    private float frustumWidth;
+
+    private void Awake()
+    {
+        //an important note here is the fact that this scene is loaded many times
+        //this is important since static elements should still persist since the
+        //VM didn't restart; It reloaded.
+        
+        //if this is an issue see script execution order. 
+        //Edit > project settings > script execution order.
+        instance = this;
+        entities = new ConcurrentDictionary<string, GameEntity>();
+        EntityFactory.setActiveManager(this);
+     
+    }
+
     void Start()
     {
+        
         scoreText = uiDocument.rootVisualElement.Q<Label>("ScoreLabel");
-
-        platformPrefab = Resources.Load<GameObject>("Platform");
         spawnPosition = player.transform.position;
-        if (platformPrefab == null)
-            Debug.LogError("No platform prefab found");
-
-//////////////////////////////         
-        ammoPrefab = Resources.Load<GameObject>("Ammo");
-
-        if (ammoPrefab == null)
-            Debug.LogError("No bullet prefab found");
-//////////////////////////////              
-
+        
         mainCamera = Camera.main;
         if (mainCamera == null)
             throw new Exception("No main camera found");
         
-
-        
-        activePlatforms = new List<GameObject>();
-        activeAmmo = new List<GameObject>();
-        
         height = player.transform.position.y;
         minPlatformHeight = player.transform.position.y;
-        worldUpdates();
+        worldManager = new GenerationManager(platformCount, platformRise,player.transform.position);
+        
+        frustumWidth = mainCamera.ScreenToWorldPoint(new Vector3(mainCamera.pixelWidth, 0, 0)).x;
+        worldManager.generateWorld(frustumWidth,platformCount);
+
     }
 
     
@@ -69,40 +75,43 @@ public class GameManager : MonoBehaviour
     {
         Transform transform = player.gameObject.transform;
         float cameraLevel =  Math.Max(transform.position.y, height); //height is the camera height
-        minPlatformHeight = Math.Max(cameraLevel, minPlatformHeight);
+        
+        if (cameraLevel > height)
+        {
+            height = cameraLevel;
+            score = Mathf.FloorToInt(height);
+            scoreText.text = "Score: " + score;
+            
+            ScoreManager.Instance.AddScore(score);
+            worldUpdates();
+        }
+        else
+        {
+            float ascension = (Time.fixedDeltaTime / Time.timeScale) * baseVerticalScrollRate;
+            cameraLevel += ascension;
+        }
         
         mainCamera.transform.position = new Vector3(spawnPosition.x, cameraLevel, mainCamera.transform.position.z);
-        
+
 
         float cameraMin = mainCamera.ScreenToWorldPoint(new Vector3(0, mainCamera.pixelHeight, 0)).y;
         float diff = cameraMin - mainCamera.transform.position.y;
         eliminationPoint = mainCamera.transform.position.y - diff;
+        minPlatformHeight = Math.Max(mainCamera.transform.position.y + diff, minPlatformHeight);
 
         if (transform.position.y < eliminationPoint)
         {
             player.die();
             return;
         }  
-    
-
-        if (cameraLevel > height)
-        {
-            height = cameraLevel;
-            score = Mathf.FloorToInt(height);
-            scoreText.text = "Score: " + score;
-                
-            Debug.Log(ScoreManager.Instance);
-            ScoreManager.Instance.AddScore(score);
-            worldUpdates();
-        }
-
+        
         height = cameraLevel;
         
-        float width = mainCamera.ScreenToWorldPoint(new Vector3(mainCamera.pixelWidth, 0, 0)).x;
+        
 
         int reflect = transform.position.x > 0 ? -1 : 1;
         float boundary = Math.Abs(transform.position.x);
-        if (boundary >= width)
+        if (boundary >= frustumWidth)
         {
             if (player.isOnGround())
                 player.setHorizontalMovementRestriction(-reflect);
@@ -115,98 +124,69 @@ public class GameManager : MonoBehaviour
 
     private void worldUpdates()
     {
-        
-
-        int destroyed = removePlatforms();
-        int diff = platformCount - destroyed;
-
-        for (int i = 0; i < diff; i++)
-            generateWorld();
+        float width = frustumWidth - 1;
+        worldManager.ascend(minPlatformHeight, width, eliminationPoint);
+        updateBoundaries();
     }
 
-
-    //returns the number of platforms removed
-    public int removePlatforms()
+    private void updateBoundaries()
     {
-
-        while (activeAmmo.Count > 0)
-        {
-            GameObject ammoPickup = activeAmmo[0];
-            if (ammoPickup == null)
+        float minX = spawnPosition.x - frustumWidth;
+        float maxX = spawnPosition.x + frustumWidth;
+        
+        foreach (KeyValuePair<string, GameEntity> pair in entities) {
+            GameEntity entity = pair.Value;
+            if (entity.transform.position.y < eliminationPoint)
             {
-                activeAmmo.RemoveAt(0);
+                entity.die();
                 continue;
             }
-            
-            float pickupYCoord = ammoPickup.transform.position.y;
-            if (pickupYCoord >= eliminationPoint)
-                break;
 
-            activeAmmo.RemoveAt(0);
-            Destroy(ammoPickup);
+            float x = entity.transform.position.x;
+            if (x > maxX || x < minX)
+            {
+                entity.die();
+            }
+
 
         }
-        
-        
-
-        if (activePlatforms.Count <= 0)
-            return 0;
-
-        int destroyed = 0;
-        float yLevel = activePlatforms[0].transform.position.y;
-        while (activePlatforms.Count > 0 && (yLevel < eliminationPoint))
-        {
-            GameObject current = activePlatforms[0];
-            yLevel = current.transform.position.y;
-
-            if (yLevel >= eliminationPoint)
-                break;
-            
-            activePlatforms.RemoveAt(0);
-            Destroy(current);
-            destroyed++;
-        }
-
-        return destroyed;
     }
 
-    public void generateWorld()
-    {
-        if (activePlatforms.Count > platformCount)
-            return;
-        
-        float width = mainCamera.ScreenToWorldPoint(new Vector3(mainCamera.pixelWidth, 0, 0)).x - 1;
-       
-        minPlatformHeight += platformRise;
-        
-        float coordinateX = (int)(Random.Range(-width, width) + spawnPosition.x);
-        GameObject platform = Instantiate(platformPrefab,new Vector3(coordinateX, (int)minPlatformHeight, 0), Quaternion.identity);
-        
-        
-        bool ammoSpawnChance = (Random.value) > 0.7f;
-        if (activeAmmo.Count < ammoAmount && ammoSpawnChance)
-        {
-            GameObject ammoDrop = Instantiate(ammoPrefab,new Vector3(coordinateX, (int)minPlatformHeight + 1, 0), Quaternion.identity);
-            activeAmmo.Add(ammoDrop);
-        }
-        
-        
-        float roll = Random.value;
-        const float THRESHOLD = 0.7f;
 
-        GameObject platform2 = null;
-        if (roll > THRESHOLD)
-        {
-            float direction = Random.value;
-            int offset = direction > 0.5f ? 1 : -1;
-            platform2 = Instantiate(platformPrefab, new Vector3(coordinateX + (offset * platformPrefab.transform.localScale.x), (int)minPlatformHeight,0),
-                Quaternion.identity);
-        }
-        
-        activePlatforms.Add(platform);
-        if (platform2 != null)
-            activePlatforms.Add(platform2);
-        
+    public void removeEntity(string uuid)
+    {
+        if (entities.ContainsKey(uuid))
+            entities.Remove(uuid, out GameEntity entity);
+    }
+
+    public void addEntity(GameEntity entity)
+    {
+        entities.TryAdd(entity.getID(), entity);
+    }
+
+    public GameEntity getEntity(string uuid)
+    {
+        GameEntity entity = null;
+       entities.TryGetValue(uuid, out entity);
+        return entity;
+    }
+
+    public float getFrustumWidth()
+    {
+        return frustumWidth;
+    }
+
+    //returns camera transform y and 1/2 the width of the frustum
+    public Vector2 getCameraParams()
+    {
+        float cameraMin = mainCamera.ScreenToWorldPoint(new Vector3(0, mainCamera.pixelHeight, 0)).y;
+        float diff = cameraMin - mainCamera.transform.position.y;
+        return new Vector2(mainCamera.transform.position.y, diff);
+    }
+
+    public float getSpawnX()
+    {
+        return spawnPosition.x;
     }
 }
 

@@ -13,5 +13,10 @@ namespace Entity
             return health;
         }
 
+        public override void die()
+        {
+            GameManager.instance.removeEntity(getID());
+            Destroy(gameObject);
+        }
     }
 }
