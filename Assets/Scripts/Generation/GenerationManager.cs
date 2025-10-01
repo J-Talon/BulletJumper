@@ -29,7 +29,7 @@ namespace Generation
                 Debug.LogError("No bullet prefab found");
             
             if (platformPrefab == null)
-                Debug.LogError("No bullet prefab found");
+                Debug.LogError("No platform prefab found");
             
             activePlatforms = new List<GameObject>();
             this.maxPlatforms = maxPlatforms;
@@ -42,8 +42,8 @@ namespace Generation
         public void ascend(float yLevel, float frustumWidth, float eliminationPoint)
         {
             minPlatformHeight = yLevel;
-            int removed = removePlatforms(eliminationPoint);
-            if (removed > 0 || activePlatforms.Count < maxPlatforms)
+            removePlatforms(eliminationPoint);
+            if (activePlatforms.Count < maxPlatforms)
                 generateWorld(frustumWidth, (maxPlatforms - activePlatforms.Count));
         }
         
@@ -51,17 +51,18 @@ namespace Generation
         
         public void generateWorld(float frustumWidth, int amountToGenerate)
         {
-            
+            Debug.Log("generating: "+amountToGenerate);
             int amountGenerated = 0;
             int riseAttempts = 0;
-            int MAX_ATTEMPTS = 3;
+            int MAX_ATTEMPTS = 2;
             
             while (amountGenerated < amountToGenerate)
             {
                 if (activePlatforms.Count >= maxPlatforms)
                     break;
 
-                bool riseRoll = Random.value > 0.6f;
+                minPlatformHeight += platformRiseAmount;
+                bool riseRoll = Random.value > 0.95f;
                 if (riseRoll)
                 {
                     riseAttempts++;
