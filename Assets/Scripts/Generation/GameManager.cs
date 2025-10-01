@@ -17,7 +17,7 @@ public class GameManager : MonoBehaviour
     
     [SerializeField] public int platformCount = 50;
 
-    [SerializeField] public float baseVerticalScrollRate = 0.25f;
+    [SerializeField] public float baseVerticalScrollRate = 0f;
     
     
     private float eliminationPoint;
