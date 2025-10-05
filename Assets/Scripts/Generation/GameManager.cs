@@ -63,10 +63,15 @@ public class GameManager : MonoBehaviour
         
         height = player.transform.position.y;
         minPlatformHeight = player.transform.position.y;
-        worldManager = new GenerationManager(platformCount, platformRise,player.transform.position);
         
         frustumWidth = mainCamera.ScreenToWorldPoint(new Vector3(mainCamera.pixelWidth, 0, 0)).x;
-        worldManager.generateWorld(frustumWidth,platformCount);
+        float cameraMax = mainCamera.ScreenToWorldPoint(new Vector3(0, mainCamera.pixelHeight, 0)).y;
+        float halfHeight = cameraMax - mainCamera.transform.position.y;
+        float camBottom = mainCamera.transform.position.y - halfHeight;
+        float camHeight = cameraMax - camBottom;
+        
+        worldManager = new GenerationManager(platformCount, platformRise,player.transform.position, camHeight);
+        worldManager.generate(halfHeight,frustumWidth,eliminationPoint);
 
     }
 
@@ -125,7 +130,7 @@ public class GameManager : MonoBehaviour
     private void worldUpdates()
     {
         float width = frustumWidth - 1;
-        worldManager.ascend(minPlatformHeight, width, eliminationPoint);
+        worldManager.generate(minPlatformHeight, width, eliminationPoint);
         updateBoundaries();
     }
 

@@ -13,6 +13,7 @@ namespace Input
             manager.mouseMoveDispatcher.action += mousePositionUpdate;
             manager.mouseDownDispatcher.action += leftMousePress;
             manager.mouseUpDispatcher.action += leftMouseRelease;
+            manager.mouseHoldDownDispatcher.action += mouseHoldDown;
         }
 
         public void unsubscribe()
@@ -22,6 +23,7 @@ namespace Input
             manager.mouseMoveDispatcher.action -= mousePositionUpdate;
             manager.mouseDownDispatcher.action -= leftMousePress;
             manager.mouseUpDispatcher.action -= leftMouseRelease;
+            manager.mouseHoldDownDispatcher.action -= mouseHoldDown;
         }
 
 
@@ -32,6 +34,8 @@ namespace Input
         public abstract void leftMousePress(float mouseValue);
         
         public abstract void leftMouseRelease(float mouseValue);
+
+        public abstract void mouseHoldDown(float mouseValue);
 
     }
 }

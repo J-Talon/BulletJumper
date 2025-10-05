@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class SoundManager : MonoBehaviour
@@ -8,6 +9,8 @@ public class SoundManager : MonoBehaviour
     public static SoundManager instance;
 
     private const string PATH = "SoundEffects";
+    private Dictionary<string, AudioClip> clips;
+        
     
     private void Awake()
     {
@@ -18,7 +21,8 @@ public class SoundManager : MonoBehaviour
         channelPrefab = Resources.Load<GameObject>(PATH+"/AudioChannel");
         if (channelPrefab == null)
             throw new Exception("could not get audio prefab");
-
+        
+        clips = new Dictionary<string, AudioClip>();
         addNewSoundChannel();
 
     }
@@ -41,9 +45,21 @@ public class SoundManager : MonoBehaviour
     //return audio channel or null if none exists
     public AudioSource getChannel(int index)
     {
+        if (index < 0)
+        {
+            return null;
+        }
+
+        int channels = activeChannels() - 1;
+        while (channels < index)
+        {
+            channels = addNewSoundChannel();
+        }
+
         Transform child = gameObject.transform.GetChild(index);
         if (child == null)
             return null;
+        
         return child.gameObject.GetComponent<AudioSource>();
     }
 
@@ -57,7 +73,17 @@ public class SoundManager : MonoBehaviour
 
     public bool playSound(String name, int channel)
     {
-        AudioClip clip = Resources.Load<AudioClip>(PATH+"/"+name);
+        AudioClip clip;
+        if (clips.ContainsKey(name))
+        {
+           clips.TryGetValue(name, out clip);
+        }
+        else
+        {
+            clip = Resources.Load<AudioClip>(PATH+"/"+name);
+            clips.Add(name, clip);
+        }
+
         if (clip == null)
         {
             return false;

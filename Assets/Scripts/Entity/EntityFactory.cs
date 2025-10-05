@@ -13,6 +13,7 @@ namespace Entity
         private static GameObject AMMO_PICKUP_PREFAB = Resources.Load<GameObject>("Ammo");
         private static GameObject SEAGULL = Resources.Load<GameObject>("Seagull");
         private static Sprite EGG_SPRITE = Resources.Load<Sprite>("DynamicSprites/egg-32x32");
+        private static GameObject HEALTH_PICKUP_PREFAB = Resources.Load<GameObject>("PickupHealth");
         
         private static GameManager manager;
 
@@ -65,7 +66,7 @@ namespace Entity
         }
 
 
-        public static Pickup createPickup(Vector2 transform)
+        public static Pickup createAmmoPickup(Vector2 transform)
         {
             if (AMMO_PICKUP_PREFAB == null)
             {
@@ -79,6 +80,24 @@ namespace Entity
             manager.addEntity(pickup);
             return pickup;
         }
+        
+        
+        public static Pickup createHealthPickup(Vector2 transform)
+        {
+            if (HEALTH_PICKUP_PREFAB == null)
+            {
+                Debug.Log("health prefab not found");
+                return null;
+            }
+            
+            GameObject ammo = GameObject.Instantiate(HEALTH_PICKUP_PREFAB,new Vector3(transform.x, transform.y, 0), Quaternion.identity);
+            Pickup pickup = ammo.GetComponent<Pickup>();
+            pickup.setHasGravity(false);
+            manager.addEntity(pickup);
+            return pickup;
+        }
+        
+        
 
 
         public static GameEnemy createSeagull(Vector2 transform) 
