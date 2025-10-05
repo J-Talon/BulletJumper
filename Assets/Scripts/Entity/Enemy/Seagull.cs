@@ -106,9 +106,21 @@ namespace Entity.Enemy
 
         public override void die()
         {
-            Pickup pickup = EntityFactory.createPickup(gameObject.transform.position);
+            float chance = Random.value;
+
+            Pickup pickup;
+            if (chance > 0.5f)
+            {
+                pickup = EntityFactory.createAmmoPickup(gameObject.transform.position);
+            }
+            else
+            {
+                pickup = EntityFactory.createHealthPickup(gameObject.transform.position);
+            }
+
             pickup.setHasGravity(true);
             base.die();
+            
         }
 
 

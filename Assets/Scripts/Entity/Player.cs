@@ -37,6 +37,12 @@ namespace Entity
 
         private int movementRestriction;
 
+        private const float INVULERABILITY_MILLIS = 1000;
+        private float lastDamageTime;
+
+
+        private bool chargeNotified;
+
         [SerializeField]
         private float impulseDamping;
         
@@ -56,6 +62,8 @@ namespace Entity
         
         //distance to perform the raycast
         [SerializeField] public float castDistance;
+
+        [SerializeField] public int maxHealth = 3;
 
         public UIDocument uiDocument;
         private Label ammoText;
@@ -84,6 +92,10 @@ namespace Entity
             axisMagnitude = 0;
             lockTime = 0;
             movementRestriction = 0;
+            
+            lastDamageTime = 0;
+            health = maxHealth;
+            chargeNotified = false;
 
             if (itemOffsetDistance <= 0)
                 itemOffsetDistance = 1;
@@ -97,6 +109,13 @@ namespace Entity
         //returns whether the player was damaged
         public override bool damage()
         {
+            float timeSeconds = Time.fixedTime;
+            float timeDiff = (timeSeconds - lastDamageTime) * 1000;
+            if (timeDiff < INVULERABILITY_MILLIS)
+                return false;
+            
+            lastDamageTime = timeSeconds;
+            
             health -= 1;
             if (health <= 0)
             {
@@ -104,6 +123,11 @@ namespace Entity
             }
 
             return true;
+        }
+
+        public void heal()
+        {
+            health = Math.Min(maxHealth, health + 1);
         }
 
 
@@ -377,6 +401,7 @@ namespace Entity
 
         public void leftMouseRelease(float mouseValue)
         {
+            chargeNotified = false;
             float holdTime = (Time.fixedTime * 1000f) - mouseDownTime;
             if (holdingItem != null)
                 holdingItem.fire(Time.fixedTime,this,facingDirection ,holdTime);
@@ -385,7 +410,30 @@ namespace Entity
                 Debug.Log("holdingItem is null");
             }
         }
-        
+
+
+        //this is called iteratively while the mouse is held down
+        public void mouseHoldDown(float mouseValue)
+        {
+            if (holdingItem == null)
+                return;
+
+            if (chargeNotified)
+                return;
+            
+            float holdTime = (Time.fixedTime * 1000f) - mouseDownTime;
+            bool charged = holdingItem.isCharged(holdTime);
+
+            if (!charged)
+                return;
+            
+            chargeNotified = true;
+            
+            
+            //Set UI here for the gun being charged
+            
+        }
+
         ///////////////////////////////////
         //getters / setters
 

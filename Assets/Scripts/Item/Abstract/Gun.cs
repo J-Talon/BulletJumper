@@ -13,6 +13,8 @@ namespace Item
         protected int lastFireTime;
         protected LayerMask groundMask;
         
+        
+        
         //protected float recoilOffset;  //recoil effect
         public Gun(GameObject renderer, LayerMask ground)
         {
@@ -28,6 +30,8 @@ namespace Item
         
         //return whether the gun can fire
         protected abstract bool canFire(float fixedTime, int playerBullets);
+
+        public abstract bool isCharged(float holdMillis);
 
 
         //tick function to change the position the gun is pointing at
