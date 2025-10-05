@@ -22,6 +22,7 @@ namespace Input
         public EventDispatcher<Vector2> mouseMoveDispatcher;
         public EventDispatcher<float> mouseDownDispatcher;
         public EventDispatcher<float> mouseUpDispatcher;
+        public EventDispatcher<float> mouseHoldDownDispatcher;
 
         private Vector2 lastKeyboardVector;
         private Vector2 lastMousePosition;
@@ -43,6 +44,7 @@ namespace Input
             mouseMoveDispatcher = new EventDispatcher<Vector2>();
             mouseDownDispatcher = new EventDispatcher<float>();
             mouseUpDispatcher = new EventDispatcher<float>();
+            mouseHoldDownDispatcher = new EventDispatcher<float>();
         }
 
 
@@ -82,6 +84,12 @@ namespace Input
                 mouseDownDispatcher.dispatchEvent(mouseState);
             else if (mouseState < 1 && lastLeftMouseState >= 1)
                 mouseUpDispatcher.dispatchEvent(mouseState);
+
+            if (mouseState >= 1)
+            {
+                mouseHoldDownDispatcher.dispatchEvent(mouseState);
+            }
+
             lastLeftMouseState = mouseState;
             
         }

@@ -4,10 +4,10 @@ using UnityEngine;
 
 namespace Item
 {
-    public class Rifle: Gun
+    public class Rifle : Gun
     {
-        
-        public Rifle(GameObject reference, LayerMask ground): base(reference, ground)
+
+        public Rifle(GameObject reference, LayerMask ground) : base(reference, ground)
         {
             cooldown = 1000; //
             //set the base sprites and animations here based on the gun
@@ -25,14 +25,17 @@ namespace Item
         }
 
 
+        public override bool isCharged(float holdMillis)
+        {
+            return holdMillis >= 1000;
+        }
+
+
         public override bool fire(float fixedTime, Player player, int facingDirection, float holdMillis)
         {
             
-            float[] millisHoldStages =  new float[]{1000,2000};
-            int power = 0;
+            int power = isCharged(holdMillis) ? 1 : 0;
             int bullets = player.getPlayerBullets();
-            while (power < millisHoldStages.Length && holdMillis > millisHoldStages[power])
-                power++;
             
             
             const float SPEED = 8;
@@ -61,7 +64,7 @@ namespace Item
             Vector2 scale = direction * hypotenuse;
             Vector2 spawnPosition = new Vector2(form.position.x + scale.x, form.position.y + scale.y);
 
-            if (power <= 1)
+            if (power < 1)
             {
                 if (!canFire(fixedTime, bullets))
                 {
@@ -75,7 +78,7 @@ namespace Item
                 Vector2 recoil = direction * -10;
                 player.push(recoil);
                 animator.SetTrigger("onFire");
-                SoundManager.instance.playSound("shot");
+                SoundManager.instance.playSound("shot",1);
                 player.setPlayerBullets(bullets - 1);
                 return true;
             }
@@ -111,11 +114,10 @@ namespace Item
                 EntityFactory.createBullet(spawnPosition, player.getID(), leftBulletDir, SPEED);
                 EntityFactory.createBullet(spawnPosition, player.getID(), rightBulletDir, SPEED);
 
-                Vector2 recoil = direction * (-10 * (power));
-                //Debug.Log(power +" "+"fire 3");
+                Vector2 recoil = direction * -10;
                 player.push(recoil);
                 
-                SoundManager.instance.playSound("shot");
+                SoundManager.instance.playSound("shot",1);
                 animator.SetTrigger("onFire");
                 player.setPlayerBullets(bullets - power);
                 return true;
@@ -136,7 +138,6 @@ namespace Item
             
             form.localRotation = Quaternion.Euler(0, 0, (float)theta);
             form.localPosition = new Vector3(delta.x, delta.y, 0);
-            //animator.SetBool("onFire",false);
         }
     }
 }
