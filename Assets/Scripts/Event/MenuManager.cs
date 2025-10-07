@@ -3,7 +3,6 @@ using UnityEngine.SceneManagement;
 
 public class MenuManager : MonoBehaviour
 {
-    // public ScoreManager ScoreManager => ScoreManager;
 
     public void startGame()
     {
@@ -12,8 +11,6 @@ public class MenuManager : MonoBehaviour
 
         public void endGame()
     {
-        // ScoreManager.ResetScore();
-        // ScoreManager.ResetAmmo();
         SceneManager.LoadSceneAsync("Scenes/UI_prototype");
 
     }
