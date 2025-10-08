@@ -609,11 +609,11 @@ PrefabInstance:
       objectReference: {fileID: 1021394674}
     - target: {fileID: 5745048939791413539, guid: 75efeabbc27937a40bd626be12cc6e15, type: 3}
       propertyPath: castSeparation
-      value: 0.54
+      value: 0.44
       objectReference: {fileID: 0}
     - target: {fileID: 5745048939791413539, guid: 75efeabbc27937a40bd626be12cc6e15, type: 3}
       propertyPath: verticalCastOffset
-      value: -0.87
+      value: -0.63
       objectReference: {fileID: 0}
     - target: {fileID: 6568637461498303504, guid: 75efeabbc27937a40bd626be12cc6e15, type: 3}
       propertyPath: m_Name
