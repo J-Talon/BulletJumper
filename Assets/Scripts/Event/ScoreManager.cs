@@ -91,7 +91,7 @@ public class ScoreManager : MonoBehaviour
         return scoreData != null ? scoreData.HighScore : 0;
     }
 
-        public void AddAmmo(int points)
+    public void AddAmmo(int points)
     {
         if (ammoData != null)
         {
@@ -99,6 +99,10 @@ public class ScoreManager : MonoBehaviour
             //Debug.Log($"Score added: {points}. Current score: {scoreData.CurrentScore}");
         }
     }
+    
+    
+    
+    
 
     public void ResetAmmo()
     {

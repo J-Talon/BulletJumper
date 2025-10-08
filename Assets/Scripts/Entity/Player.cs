@@ -67,11 +67,13 @@ namespace Entity
 
         public UIDocument uiDocument;
         private Label ammoText;
+        private Label healthCount;
         
         public void Start()
         {
 
             ammoText = uiDocument.rootVisualElement.Q<Label>("AmmoCount");
+            healthCount = uiDocument.rootVisualElement.Q<Label>("HealthCount");
             ((InputListener)this).subscribe();
             rigidBody = GetComponent<Rigidbody2D>();
             animator = GetComponent<Animator>();
@@ -101,6 +103,7 @@ namespace Entity
                 itemOffsetDistance = 1;
 
             ammoText.text = "Ammo: " + bulletCount;
+            healthCount.text = "Health: " + maxHealth;
             
         }
 
@@ -135,6 +138,7 @@ namespace Entity
             lastDamageTime = timeSeconds;
             
             health -= 1;
+            healthCount.text = "Health: " + health;
             if (health <= 0)
             {
                 this.die();
@@ -146,6 +150,7 @@ namespace Entity
         public void heal()
         {
             health = Math.Min(maxHealth, health + 1);
+            healthCount.text = "Health: " + health;
         }
 
 
@@ -473,6 +478,8 @@ namespace Entity
         public void addBullets(int bullets)
         {
             this.bulletCount += bullets;
+            ScoreManager.Instance.AddAmmo(bulletCount);
+            ammoText.text = "Ammo: " + bulletCount;
         }
 
         public void removeBullets(int bullets)

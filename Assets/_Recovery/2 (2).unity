@@ -515,10 +515,6 @@ PrefabInstance:
       propertyPath: uiDocument
       value: 
       objectReference: {fileID: 1021394674}
-    - target: {fileID: 5473350280558009203, guid: f60d9379acf76f046a352149b06ef76a, type: 3}
-      propertyPath: platformCount
-      value: 40
-      objectReference: {fileID: 0}
     - target: {fileID: 8732297853076480376, guid: f60d9379acf76f046a352149b06ef76a, type: 3}
       propertyPath: m_Name
       value: GameManager
@@ -609,11 +605,11 @@ PrefabInstance:
       objectReference: {fileID: 1021394674}
     - target: {fileID: 5745048939791413539, guid: 75efeabbc27937a40bd626be12cc6e15, type: 3}
       propertyPath: castSeparation
-      value: 0.44
+      value: 0.54
       objectReference: {fileID: 0}
     - target: {fileID: 5745048939791413539, guid: 75efeabbc27937a40bd626be12cc6e15, type: 3}
       propertyPath: verticalCastOffset
-      value: -0.63
+      value: -0.87
       objectReference: {fileID: 0}
     - target: {fileID: 6568637461498303504, guid: 75efeabbc27937a40bd626be12cc6e15, type: 3}
       propertyPath: m_Name
