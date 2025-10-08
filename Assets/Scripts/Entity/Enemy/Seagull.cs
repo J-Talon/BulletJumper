@@ -14,7 +14,8 @@ namespace Entity.Enemy
         private const float ATTACK_COOLDOWN = 3; // 3 secs
         private const float PATROL_TIME = 3; // 5 secs
         private const float MOVE_SPEED = 3;
-        
+
+        private float facingDirection;
         
         private float periodTime;
         private float attackTime;
@@ -31,6 +32,7 @@ namespace Entity.Enemy
             attackTime = 0;
 
             offsetY = 0;
+            facingDirection = -1;
             
             GameManager.instance.addEntity(this);
         }
@@ -46,6 +48,26 @@ namespace Entity.Enemy
             
             patrolPosition.y = GameManager.instance.getCameraParams().x - offsetY;
             moveToLocation(patrolPosition);
+            
+            float xDiff = target.transform.position.x - gameObject.transform.position.x;
+            
+            if (xDiff < 0 && facingDirection > 0)
+            {
+                facingDirection = -1;
+                Vector3 scale = transform.localScale;
+                scale.x *= -1;
+                transform.localScale = scale;
+            }
+            else if (xDiff > 0 && facingDirection < 0)
+            {
+                facingDirection = 1;
+                Vector3 scale = transform.localScale;
+                scale.x *= -1;
+                transform.localScale = scale;
+            }
+            
+
+
 
             if (attackTime >= ATTACK_COOLDOWN)
             {
