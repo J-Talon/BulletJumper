@@ -107,7 +107,25 @@ namespace Entity
             
         }
 
-        
+
+
+        public void setGun()
+        {
+            itemRenderer = transform.GetChild(0).gameObject;
+            holdingItem = new Rifle(itemRenderer, layerMask);
+            SpriteRenderer rend = itemRenderer.GetComponent<SpriteRenderer>();
+            Animator anim = itemRenderer.GetComponent<Animator>();
+            
+            anim.runtimeAnimatorController = anim.runtimeAnimatorController;
+            
+            
+            rend.sortingOrder += 1;
+            
+        }
+
+
+
+
         //damages the player
         //returns whether the player was damaged
         public override bool damage()
