@@ -132,6 +132,7 @@ namespace Entity
         public void heal()
         {
             health = Math.Min(maxHealth, health + 1);
+            healthCount.text = "Health: " + health;
         }
 
 
