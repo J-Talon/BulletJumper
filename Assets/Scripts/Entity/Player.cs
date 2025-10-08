@@ -459,6 +459,8 @@ namespace Entity
         public void addBullets(int bullets)
         {
             this.bulletCount += bullets;
+            ScoreManager.Instance.AddAmmo(bulletCount);
+            ammoText.text = "Ammo: " + bulletCount;
         }
 
         public void removeBullets(int bullets)
